@@ -49,13 +49,14 @@ nav{
   border-bottom:1px solid var(--border);
   transition:.3s;
 }
-.nav-logo{
-  font-family:'Syne',sans-serif;
-  font-size:1.3rem;font-weight:800;
-  background:linear-gradient(90deg,#fff,var(--neon));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  letter-spacing:-0.5px;
+.nav-logo-link{
+  display:flex;align-items:center;
+  text-decoration:none;cursor:pointer;
+  transition:.3s;
 }
+.nav-logo-link:hover{opacity:.85;transform:translateY(-1px)}
+.nav-logo-icon{height:38px;width:auto;flex-shrink:0}
+@media(max-width:768px){.nav-logo-icon{height:32px}}
 .nav-links{display:flex;gap:30px;list-style:none}
 .nav-links a{
   color:var(--sub);font-size:.9rem;font-weight:500;
@@ -314,6 +315,23 @@ section{padding:100px 0}
   display:flex;align-items:center;justify-content:center;font-size:1rem;
 }
 
+/* ─── PORTFOLIO ─── */
+.pf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.pf-item{
+  position:relative;border-radius:20px;overflow:hidden;height:220px;
+  cursor:pointer;border:1px solid var(--border);
+}
+.pf-item img{width:100%;height:100%;object-fit:cover;transition:.6s;filter:brightness(.85)}
+.pf-item:hover img{transform:scale(1.08);filter:brightness(1)}
+.pf-overlay{
+  position:absolute;inset:0;display:flex;align-items:flex-end;
+  background:linear-gradient(transparent 40%,rgba(5,12,31,.92));
+  padding:18px;
+}
+.pf-overlay span{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:#fff;
+}
+
 /* ─── FEATURES STRIP ─── */
 .features{
   background:linear-gradient(135deg,rgba(0,114,255,.06),rgba(79,195,255,.04));
@@ -385,6 +403,21 @@ section{padding:100px 0}
 .badge.green{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
 .badge.blue{background:rgba(79,195,255,.1);color:var(--neon);border:1px solid rgba(79,195,255,.2)}
 .m-cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.m-related{
+  margin-top:30px;padding-top:24px;border-top:1px solid var(--border);
+}
+.m-related h5{
+  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+  color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;
+}
+.m-related-row{display:flex;gap:10px;flex-wrap:wrap}
+.m-related-link{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(79,195,255,.06);border:1px solid var(--border);
+  color:var(--text);font-size:.85rem;font-weight:500;
+  padding:9px 16px;border-radius:50px;cursor:pointer;transition:.3s;
+}
+.m-related-link:hover{border-color:var(--neon);color:var(--neon);background:rgba(79,195,255,.12);transform:translateY(-2px)}
 
 /* ─── CHATBOT ─── */
 #chat-box{
@@ -483,14 +516,34 @@ footer p{color:var(--sub);font-size:.85rem}
 </style>
 </head>
 <body>
+<div id="top"></div>
 
 <!-- NAV -->
 <nav id="main-nav">
-  <div class="nav-logo">Appline Studio</div>
+  <a href="#top" class="nav-logo-link" aria-label="Appline Studio - Ir al inicio">
+    <svg class="nav-logo-icon" viewBox="0 0 200 62" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+      <defs>
+        <linearGradient id="appGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#2fa8e6"/>
+          <stop offset="100%" stop-color="var(--neon)"/>
+        </linearGradient>
+        <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="var(--deep)"/>
+          <stop offset="100%" stop-color="var(--neon)"/>
+        </linearGradient>
+      </defs>
+      <text x="0" y="34" font-family="Syne, sans-serif" font-weight="800" font-size="30" fill="url(#appGrad)">app</text>
+      <text x="58" y="34" font-family="Syne, sans-serif" font-weight="800" font-size="30" fill="#ffffff">line</text>
+      <path d="M136,44 Q160,52 180,16" stroke="url(#arrowGrad)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M168,12 L184,15 L180,30 Z" fill="url(#arrowGrad)"/>
+      <text x="1" y="55" font-family="'Inter',sans-serif" font-weight="600" font-size="11" letter-spacing="5" fill="#ffffff">STUDIO</text>
+    </svg>
+  </a>
   <ul class="nav-links">
     <li><a href="#software">Software</a></li>
     <li><a href="#team">Equipo</a></li>
     <li><a href="#hardware">Hardware</a></li>
+    <li><a href="#portfolio">Portafolio</a></li>
     <li><a href="#repair">Soporte</a></li>
   </ul>
   <a href="sms:+13853949996" class="nav-cta">💬 Contactar</a>
@@ -504,6 +557,7 @@ footer p{color:var(--sub);font-size:.85rem}
   <a href="#software" onclick="toggleMenu()">Software</a>
   <a href="#team" onclick="toggleMenu()">Equipo</a>
   <a href="#hardware" onclick="toggleMenu()">Hardware</a>
+  <a href="#portfolio" onclick="toggleMenu()">Portafolio</a>
   <a href="#repair" onclick="toggleMenu()">Soporte</a>
   <a href="sms:+13853949996" style="color:var(--neon)">💬 Enviar SMS</a>
 </div>
@@ -588,6 +642,19 @@ footer p{color:var(--sub);font-size:.85rem}
         <h3>Cloud & DevOps</h3>
         <p>Arquitecturas cloud-native con CI/CD, contenedores Docker/Kubernetes y pipelines de despliegue automatizados.</p>
         <div class="s-link">Explorar Cloud <span>→</span></div>
+      </div>
+      <div class="s-card fade-in" style="animation-delay:.5s" onclick="openModal('cybersecurity')">
+        <span class="s-tag" style="background:rgba(0,255,136,.1);color:var(--green)">Crítico</span>
+        <div class="s-icon">🛡️</div>
+        <h3>Ciberseguridad Digital</h3>
+        <p>Pentesting, SOC 24/7 y cumplimiento normativo para proteger tu software, tus datos y tu reputación.</p>
+        <div class="s-link">Proteger mi negocio <span>→</span></div>
+      </div>
+      <div class="s-card fade-in" style="animation-delay:.55s" onclick="openModal('helpdesk')">
+        <div class="s-icon">🎧</div>
+        <h3>Soporte & Helpdesk</h3>
+        <p>Mesa de ayuda remota 24/7 con SLA garantizado para resolver incidencias de software antes que afecten tu operación.</p>
+        <div class="s-link">Ver planes <span>→</span></div>
       </div>
     </div>
   </div>
@@ -707,6 +774,17 @@ footer p{color:var(--sub);font-size:.85rem}
           <span class="hw-tag">Security First</span>
         </div>
       </div>
+      <div class="hw-card fade-in" style="animation-delay:.3s" onclick="openModal('hw_av')">
+        <div class="hw-img-box">
+          <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=700&q=80" class="hw-img-main" alt="Sala de juntas" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&q=80" class="hw-img-hover" alt="Videoconferencia" loading="lazy">
+        </div>
+        <div class="hw-body">
+          <h4>Audio/Video & Salas</h4>
+          <p>Salas de juntas inteligentes con videoconferencia 4K, pantallas táctiles y audio profesional.</p>
+          <span class="hw-tag">Collaboration Tech</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -742,15 +820,53 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </section>
 
+<!-- PORTFOLIO -->
+<section id="portfolio" style="background:linear-gradient(180deg,transparent,rgba(0,114,255,.04),transparent)">
+  <div class="wrap">
+    <div class="sec-head fade-in">
+      <span class="sec-label">▸ Trabajo Real, Resultados Reales</span>
+      <h2 class="sec-title">Portafolio & Casos de Éxito</h2>
+      <p class="sec-sub">Un vistazo a los proyectos que hemos entregado. Haz clic en cualquier imagen para ver el módulo relacionado.</p>
+    </div>
+    <div class="pf-grid">
+      <div class="pf-item fade-in" onclick="openModal('software')">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=700&q=80" alt="Dashboard ERP" loading="lazy">
+        <div class="pf-overlay"><span>ERP Retail — Custom Software</span></div>
+      </div>
+      <div class="pf-item fade-in" style="animation-delay:.1s" onclick="openModal('web')">
+        <img src="https://images.unsplash.com/photo-1522199755839-a2bacb67c546?auto=format&fit=crop&w=700&q=80" alt="Sitio web" loading="lazy">
+        <div class="pf-overlay"><span>E-commerce — Web Development</span></div>
+      </div>
+      <div class="pf-item fade-in" style="animation-delay:.2s" onclick="openModal('mobile')">
+        <img src="https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=700&q=80" alt="App móvil" loading="lazy">
+        <div class="pf-overlay"><span>Delivery App — Mobile</span></div>
+      </div>
+      <div class="pf-item fade-in" style="animation-delay:.3s" onclick="openModal('hw_enterprise')">
+        <img src="https://images.unsplash.com/photo-1591405351990-4726e331f141?auto=format&fit=crop&w=700&q=80" alt="Rack de servidores" loading="lazy">
+        <div class="pf-overlay"><span>Data Center — Hardware Empresarial</span></div>
+      </div>
+      <div class="pf-item fade-in" style="animation-delay:.4s" onclick="openModal('cybersecurity')">
+        <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=700&q=80" alt="Ciberseguridad" loading="lazy">
+        <div class="pf-overlay"><span>SOC 24/7 — Ciberseguridad</span></div>
+      </div>
+      <div class="pf-item fade-in" style="animation-delay:.5s" onclick="openModal('ai')">
+        <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=700&q=80" alt="Automatización con IA" loading="lazy">
+        <div class="pf-overlay"><span>Visión por Computadora — IA</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
-    <div class="footer-logo">Appline Studio</div>
+    <a href="#top" class="footer-logo" style="text-decoration:none;cursor:pointer">Appline Studio</a>
     <p>Advanced IT · Software, Hardware & Networking · Utah, USA</p>
     <div class="footer-links">
       <a href="#software">Software</a>
       <a href="#team">Equipo</a>
       <a href="#hardware">Hardware</a>
+      <a href="#portfolio">Portafolio</a>
       <a href="#repair">Soporte</a>
       <a href="sms:+13853949996">+1 (385) 394-9996</a>
     </div>
@@ -799,6 +915,26 @@ footer p{color:var(--sub);font-size:.85rem}
 // y devuelva { reply: "texto de respuesta" }. Cambia esta URL por la de tu backend real.
 const CHAT_BACKEND_URL = "https://TU-BACKEND-AQUI.com/api/chat";
 
+// ─── MODULE METADATA (para interconexión entre módulos) ───
+const moduleMeta = {
+  software:{icon:'💻',label:'Custom Software'},
+  web:{icon:'🌐',label:'Web Development'},
+  pos:{icon:'📊',label:'POS Systems'},
+  mobile:{icon:'📱',label:'Mobile Apps'},
+  ai:{icon:'🤖',label:'Automatización IA'},
+  cloud:{icon:'☁️',label:'Cloud & DevOps'},
+  cybersecurity:{icon:'🛡️',label:'Ciberseguridad Digital'},
+  helpdesk:{icon:'🎧',label:'Soporte & Helpdesk'},
+  hw_enterprise:{icon:'🏢',label:'Equipos para Empresa'},
+  hw_home:{icon:'🏠',label:'Equipos para Casa'},
+  hw_networking:{icon:'🌐',label:'Redes & Conectividad'},
+  hw_security:{icon:'🔒',label:'Ciberseguridad Física'},
+  hw_av:{icon:'🖥️',label:'Audio/Video & Salas'}
+};
+function relatedHTML(ids){
+  return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
+}
+
 // ─── MODAL DATA ───
 const modals = {
   software:`
@@ -820,6 +956,7 @@ const modals = {
       <tr><td>Cloud</td><td>AWS / Azure</td><td><span class="badge green">Alta Disponibilidad</span></td></tr>
     </table>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a><button class="btn-outline" onclick="closeModal();openChat()">💬 Preguntar a IA</button></div>
+    ${relatedHTML(['ai','cloud','helpdesk'])}
   `,
   web:`
     <h2>🌐 Next-Gen Web Development</h2>
@@ -839,6 +976,7 @@ const modals = {
       <tr><td>Web App a Medida</td><td>8-16 semanas</td><td><span class="badge green">SaaS</span></td></tr>
     </table>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar mi sitio</a></div>
+    ${relatedHTML(['pos','cybersecurity','cloud'])}
   `,
   pos:`
     <h2>📊 Smart POS Solutions</h2>
@@ -856,6 +994,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">👕</span><h4>Retail & Boutique</h4><p>Tallas, colores, variantes y programas de lealtad para tiendas físicas y online.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Demo Gratuita</a></div>
+    ${relatedHTML(['hw_enterprise','web','helpdesk'])}
   `,
   mobile:`
     <h2>📱 Mobile App Development</h2>
@@ -868,6 +1007,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">🔔</span><h4>Push & Engagement</h4><p>Notificaciones inteligentes, deep linking, analytics de comportamiento y onboarding optimizado.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar App</a></div>
+    ${relatedHTML(['ai','cloud','cybersecurity'])}
   `,
   ai:`
     <h2>🤖 Automatización con IA</h2>
@@ -880,6 +1020,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">📊</span><h4>Analítica Predictiva</h4><p>Modelos de ML que predicen demanda, detectan fraude y optimizan tu supply chain.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi caso</a></div>
+    ${relatedHTML(['software','cloud','helpdesk'])}
   `,
   cloud:`
     <h2>☁️ Cloud & DevOps</h2>
@@ -892,6 +1033,39 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">🔒</span><h4>IaC & Seguridad</h4><p>Terraform, Vault y políticas de seguridad como código para infraestructura reproducible y auditada.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Consultar</a></div>
+    ${relatedHTML(['cybersecurity','hw_enterprise','helpdesk'])}
+  `,
+  cybersecurity:`
+    <h2>🛡️ Ciberseguridad Digital</h2>
+    <p class="m-sub">La mejor tecnología no sirve de nada sin protección. Auditamos, blindamos y monitoreamos tu software y datos contra amenazas reales, 24/7.</p>
+    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Ciberseguridad Digital" loading="lazy">
+    <div class="m-grid">
+      <div class="m-feat"><span class="mf-icon">🕵️</span><h4>Pentesting & Auditorías</h4><p>Simulamos ataques reales a tus sistemas para encontrar vulnerabilidades antes que los hackers.</p></div>
+      <div class="m-feat"><span class="mf-icon">🧠</span><h4>SOC 24/7</h4><p>Centro de operaciones de seguridad con monitoreo continuo, detección y respuesta a incidentes en tiempo real.</p></div>
+      <div class="m-feat"><span class="mf-icon">📋</span><h4>Cumplimiento Normativo</h4><p>Te ayudamos a cumplir con HIPAA, PCI-DSS, SOC 2 y otras regulaciones según tu industria.</p></div>
+      <div class="m-feat"><span class="mf-icon">🔐</span><h4>Cifrado & Gestión de Accesos</h4><p>Cifrado extremo a extremo, autenticación multifactor y políticas de mínimo privilegio.</p></div>
+    </div>
+    <table class="m-table">
+      <tr><th>Servicio</th><th>Frecuencia</th><th>Nivel</th></tr>
+      <tr><td>Escaneo de Vulnerabilidades</td><td>Semanal</td><td><span class="badge green">Incluido</span></td></tr>
+      <tr><td>Pentesting Completo</td><td>Trimestral</td><td><span class="badge blue">Recomendado</span></td></tr>
+      <tr><td>Respuesta a Incidentes</td><td>24/7</td><td><span class="badge green">Prioritario</span></td></tr>
+    </table>
+    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi negocio</a></div>
+    ${relatedHTML(['hw_security','software','helpdesk'])}
+  `,
+  helpdesk:`
+    <h2>🎧 Soporte & Helpdesk</h2>
+    <p class="m-sub">Un equipo técnico disponible cuando lo necesitas, para que tú te enfoques en tu negocio y nosotros en que la tecnología nunca te detenga.</p>
+    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Soporte Helpdesk" loading="lazy">
+    <div class="m-grid">
+      <div class="m-feat"><span class="mf-icon">⏱️</span><h4>SLA Garantizado</h4><p>Tiempos de respuesta desde 15 minutos para incidencias críticas, con escalamiento automático.</p></div>
+      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>Soporte Remoto</h4><p>Acceso remoto seguro a equipos y servidores para resolver problemas sin esperar visitas presenciales.</p></div>
+      <div class="m-feat"><span class="mf-icon">📚</span><h4>Base de Conocimiento</h4><p>Documentación y tickets centralizados para que tu equipo aprenda a resolver lo básico por sí mismo.</p></div>
+      <div class="m-feat"><span class="mf-icon">📈</span><h4>Reportes Mensuales</h4><p>Métricas claras de incidencias resueltas, tiempos de respuesta y salud general de tu infraestructura.</p></div>
+    </div>
+    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Ver Planes de Soporte</a></div>
+    ${relatedHTML(['cybersecurity','hw_enterprise','software'])}
   `,
   hw_enterprise:`
     <h2>🏢 Equipos para Empresa</h2>
@@ -911,6 +1085,7 @@ const modals = {
       <tr><td>Cisco</td><td>Networking Enterprise</td><td><span class="badge blue">Por pedido</span></td></tr>
     </table>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a></div>
+    ${relatedHTML(['hw_networking','hw_security','cloud'])}
   `,
   hw_home:`
     <h2>🏠 Equipos para Casa & Home Office</h2>
@@ -923,6 +1098,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">🎮</span><h4>Gaming Rigs</h4><p>Builds enteras con gestión de cables, RGB sincronizado y refrigeración líquida custom.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Armar mi PC</a></div>
+    ${relatedHTML(['hw_networking','hw_av','helpdesk'])}
   `,
   hw_networking:`
     <h2>🌐 Redes & Conectividad Profesional</h2>
@@ -935,6 +1111,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">📊</span><h4>Monitoreo de Red</h4><p>PRTG, Zabbix y dashboards personalizados para visibilidad total del tráfico y alertas proactivas.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi red</a></div>
+    ${relatedHTML(['hw_security','hw_av','cybersecurity'])}
   `,
   hw_security:`
     <h2>🔒 Ciberseguridad & Vigilancia</h2>
@@ -947,6 +1124,20 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">🛡️</span><h4>Endpoint Security</h4><p>Antivirus empresarial, EDR y gestión centralizada de dispositivos con respuesta automática a amenazas.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi seguridad</a></div>
+    ${relatedHTML(['cybersecurity','hw_networking','hw_av'])}
+  `,
+  hw_av:`
+    <h2>🖥️ Audio/Video & Salas de Juntas</h2>
+    <p class="m-sub">Convierte cualquier sala en un espacio de colaboración de nivel mundial. Videoconferencia nítida, audio profesional y control con un solo toque.</p>
+    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Sala de juntas inteligente" loading="lazy">
+    <div class="m-grid">
+      <div class="m-feat"><span class="mf-icon">📹</span><h4>Videoconferencia 4K</h4><p>Cámaras con seguimiento automático y cancelación de ruido para reuniones híbridas sin fricciones.</p></div>
+      <div class="m-feat"><span class="mf-icon">🖱️</span><h4>Pantallas Táctiles Interactivas</h4><p>Pizarras digitales para colaboración en tiempo real entre equipos remotos y presenciales.</p></div>
+      <div class="m-feat"><span class="mf-icon">🔊</span><h4>Audio Profesional</h4><p>Micrófonos de techo y parlantes calibrados para que cada palabra se escuche con claridad.</p></div>
+      <div class="m-feat"><span class="mf-icon">📲</span><h4>Control Unificado</h4><p>Integración con Zoom, Teams y Google Meet, controlado desde una sola tablet en la sala.</p></div>
+    </div>
+    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Equipar mi sala</a></div>
+    ${relatedHTML(['hw_networking','hw_enterprise','helpdesk'])}
   `
 };
 
