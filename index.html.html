@@ -7,6 +7,10 @@
 <meta name="description" content="Appline Studio: desarrollo de software a medida, hardware empresarial, redes, ciberseguridad y soporte técnico en Utah, USA.">
 <meta name="theme-color" content="#050c1f">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- STRIPE SDK -->
+<script src="https://js.stripe.com/v3/"></script>
+
 <style>
 :root {
   --neon: #4fc3ff;
@@ -70,6 +74,14 @@ nav{
   text-decoration:none;letter-spacing:.5px;transition:.3s;
 }
 .nav-cta:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(79,195,255,.4)}
+.nav-pay-btn{
+  background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);
+  color:var(--green);font-weight:700;font-size:.85rem;
+  padding:10px 20px;border-radius:50px;cursor:pointer;transition:.3s;
+  display:flex;align-items:center;gap:6px;margin-left:10px;
+}
+.nav-pay-btn:hover{background:rgba(0,255,136,.2);transform:translateY(-1px)}
+
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:5px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--neon);transition:.3s}
 .mobile-menu{
@@ -152,6 +164,14 @@ nav{
   text-decoration:none;display:inline-block;
 }
 .btn-outline:hover{border-color:var(--neon);color:var(--neon);transform:translateY(-3px)}
+.btn-pay{
+  background:linear-gradient(135deg,var(--green),#00b359);
+  color:#000;font-weight:700;padding:15px 35px;
+  border-radius:50px;border:none;cursor:pointer;font-size:1rem;
+  transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-pay:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(0,255,136,.3)}
+
 .hero-stats{
   display:flex;gap:50px;justify-content:center;flex-wrap:wrap;
   margin-top:70px;padding-top:50px;
@@ -344,7 +364,7 @@ section{padding:100px 0}
 .feat-item h4{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
 .feat-item p{font-size:.83rem;color:var(--sub)}
 
-/* ─── MODAL ─── */
+/* ─── MODAL & CHECKOUT MODAL ─── */
 .modal{
   position:fixed;inset:0;z-index:6000;
   background:rgba(5,12,31,.95);
@@ -370,6 +390,48 @@ section{padding:100px 0}
   display:flex;align-items:center;justify-content:center;transition:.3s;
 }
 .modal-close:hover{background:rgba(79,195,255,.15);transform:rotate(90deg)}
+
+/* ESTILOS FORMULARIO DE PAGO */
+.pay-form-group {
+  margin-bottom: 20px;
+}
+.pay-form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pay-form-group input, .pay-form-group select {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: .3s;
+}
+.pay-form-group input:focus, .pay-form-group select:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 10px rgba(79,195,255,0.2);
+}
+#card-element {
+  background: rgba(255,255,255,0.05);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+#card-errors {
+  color: #ff5555;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
 #modal-body h2{
   font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.2rem);
   font-weight:800;color:var(--neon);margin-bottom:12px;
@@ -546,7 +608,10 @@ footer p{color:var(--sub);font-size:.85rem}
     <li><a href="#portfolio">Portafolio</a></li>
     <li><a href="#repair">Soporte</a></li>
   </ul>
-  <a href="sms:+13853949996" class="nav-cta">💬 Contactar</a>
+  <div style="display:flex;align-items:center;">
+    <a href="sms:+13853949996" class="nav-cta">💬 Contactar</a>
+    <button class="nav-pay-btn" onclick="openPaymentModal()">💳 Pagar</button>
+  </div>
   <button class="hamburger" onclick="toggleMenu()" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
     <span></span><span></span><span></span>
   </button>
@@ -559,6 +624,7 @@ footer p{color:var(--sub);font-size:.85rem}
   <a href="#hardware" onclick="toggleMenu()">Hardware</a>
   <a href="#portfolio" onclick="toggleMenu()">Portafolio</a>
   <a href="#repair" onclick="toggleMenu()">Soporte</a>
+  <a href="javascript:void(0)" onclick="toggleMenu();openPaymentModal()" style="color:var(--green)">💳 Realizar Pago</a>
   <a href="sms:+13853949996" style="color:var(--neon)">💬 Enviar SMS</a>
 </div>
 
@@ -572,6 +638,7 @@ footer p{color:var(--sub);font-size:.85rem}
     <p>Software, Hardware & Redes de clase mundial. Transformamos negocios con tecnología a medida en Utah y más allá.</p>
     <div class="hero-btns">
       <a href="#software" class="btn-primary">Ver Servicios</a>
+      <button class="btn-pay" onclick="openPaymentModal()">💳 Realizar un Pago</button>
       <button class="btn-outline" onclick="openChat()">🤖 Hablar con IA</button>
     </div>
   </div>
@@ -813,6 +880,7 @@ footer p{color:var(--sub);font-size:.85rem}
         </ul>
         <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap">
           <a href="sms:+13853949996" class="btn-primary">📲 Solicitar Soporte</a>
+          <button class="btn-pay" onclick="openPaymentModal('Soporte Técnico')">💳 Pagar Servicio</button>
           <button class="btn-outline" onclick="openChat()">Hablar con IA →</button>
         </div>
       </div>
@@ -868,17 +936,66 @@ footer p{color:var(--sub);font-size:.85rem}
       <a href="#hardware">Hardware</a>
       <a href="#portfolio">Portafolio</a>
       <a href="#repair">Soporte</a>
+      <a href="javascript:void(0)" onclick="openPaymentModal()" style="color:var(--green)">Pagar en línea</a>
       <a href="sms:+13853949996">+1 (385) 394-9996</a>
     </div>
     <div class="footer-bottom">© 2026 Appline Studio LLC · Utah, USA · Todos los derechos reservados</div>
   </div>
 </footer>
 
-<!-- MODAL -->
+<!-- MODAL INFORMATIVO -->
 <div id="modal" class="modal" onclick="handleModalClick(event)">
   <div class="modal-inner">
     <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">×</button>
     <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- MODAL DE PAGO STRIPE -->
+<div id="payment-modal" class="modal" onclick="handlePayModalClick(event)">
+  <div class="modal-inner" style="max-width:550px;">
+    <button class="modal-close" onclick="closePaymentModal()" aria-label="Cerrar">×</button>
+    <h2>💳 Portal de Pagos</h2>
+    <p class="m-sub">Procesamiento seguro con cifrado de grado bancario (Stripe)</p>
+
+    <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
+      <div class="pay-form-group">
+        <label for="pay-name">Nombre completo</label>
+        <input type="text" id="pay-name" required placeholder="Ej. Marcos Torres">
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-email">Correo Electrónico</label>
+        <input type="email" id="pay-email" required placeholder="cliente@ejemplo.com">
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-service">Servicio / Concepto</label>
+        <select id="pay-service" required>
+          <option value="Custom Software">Custom Software / Desarrollo</option>
+          <option value="Web Development">Desarrollo Web / Landing Page</option>
+          <option value="POS System">Sistema POS</option>
+          <option value="Soporte Tecnico">Soporte Técnico / Reparación</option>
+          <option value="Hardware / Equipos">Hardware / Venta de Equipos</option>
+          <option value="Otro Servicio">Otro / Pago de Factura Custom</option>
+        </select>
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-amount">Monto a Pagar (USD)</label>
+        <input type="number" id="pay-amount" min="1" step="0.01" required placeholder="0.00">
+      </div>
+
+      <div class="pay-form-group">
+        <label>Información de Tarjeta</label>
+        <div id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
+      </div>
+
+      <button type="submit" id="pay-submit-btn" class="btn-pay" style="width:100%;justify-content:center;margin-top:10px;">
+        🔒 Procesar Pago Seguro
+      </button>
+    </form>
   </div>
 </div>
 
@@ -887,7 +1004,7 @@ footer p{color:var(--sub);font-size:.85rem}
   <div class="chat-head">
     <div class="chat-ai-name">
       <span class="ai-dot"></span>
-      <div><h4>Appline AI</h4><small>Claude-powered · Siempre activo</small></div>
+      <div><h4>Appline AI</h4><small>Siempre activo</small></div>
     </div>
     <button class="chat-close-btn" onclick="closeChat()" aria-label="Cerrar chat">×</button>
   </div>
@@ -907,15 +1024,126 @@ footer p{color:var(--sub);font-size:.85rem}
 </div>
 
 <script>
-// ─── CONFIGURACIÓN DEL CHAT ───
-// IMPORTANTE: la API de Anthropic NO se puede llamar de forma segura directo desde el
-// navegador (bloqueo CORS + expondría tu API key públicamente). Este endpoint debe ser
-// un backend propio (ej. una función serverless en Vercel/Cloudflare/Netlify) que reciba
-// el mensaje del usuario, llame a la API de Anthropic guardando la key en el servidor,
-// y devuelva { reply: "texto de respuesta" }. Cambia esta URL por la de tu backend real.
-const CHAT_BACKEND_URL = "https://TU-BACKEND-AQUI.com/api/chat";
+// ─── CONFIGURACIÓN DE STRIPE ───
+// Clave pública de prueba asignada
+const STRIPE_PUBLIC_KEY = "pk_test_TYooA4J0D25a38QM92qBf41n"; 
+let stripe, cardElement;
 
-// ─── MODULE METADATA (para interconexión entre módulos) ───
+if (typeof Stripe !== 'undefined') {
+  stripe = Stripe(STRIPE_PUBLIC_KEY);
+  const elements = stripe.elements();
+  
+  cardElement = elements.create('card', {
+    style: {
+      base: {
+        color: '#e8f4ff',
+        fontFamily: "'Inter', sans-serif",
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': { color: '#7ba8d4' }
+      },
+      invalid: {
+        color: '#ff5555',
+        iconColor: '#ff5555'
+      }
+    }
+  });
+}
+
+function openPaymentModal(serviceName = '') {
+  document.getElementById('payment-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  if (cardElement && !document.getElementById('card-element').hasChildNodes()) {
+    cardElement.mount('#card-element');
+    cardElement.on('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      displayError.textContent = event.error ? event.error.message : '';
+    });
+  }
+
+  if (serviceName) {
+    const select = document.getElementById('pay-service');
+    for (let option of select.options) {
+      if (option.value.toLowerCase().includes(serviceName.toLowerCase())) {
+        option.selected = true;
+        break;
+      }
+    }
+  }
+}
+
+function closePaymentModal() {
+  document.getElementById('payment-modal').classList.remove('open');
+  document.body.style.overflow = 'auto';
+}
+
+function handlePayModalClick(e) {
+  if (e.target === document.getElementById('payment-modal')) closePaymentModal();
+}
+
+async function handlePaymentSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('pay-submit-btn');
+  const errorElement = document.getElementById('card-errors');
+  errorElement.textContent = '';
+  
+  btn.disabled = true;
+  btn.innerText = '⏳ Procesando pago...';
+
+  const name = document.getElementById('pay-name').value;
+  const email = document.getElementById('pay-email').value;
+  const service = document.getElementById('pay-service').value;
+  const amount = document.getElementById('pay-amount').value;
+
+  try {
+    // Llama al endpoint de tu backend que genera el PaymentIntent
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: parseFloat(amount) * 100, currency: 'usd', name, email, service })
+    });
+
+    const data = await response.json();
+
+    if (!data.clientSecret) {
+      throw new Error(data.error || 'No se pudo generar la transacción. Asegúrate de configurar tu backend.');
+    }
+
+    // Confirma el pago mediante Stripe Elements
+    const result = await stripe.confirmCardPayment(data.clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: { name, email }
+      }
+    });
+
+    if (result.error) {
+      errorElement.textContent = result.error.message;
+      btn.disabled = false;
+      btn.innerText = '🔒 Procesar Pago Seguro';
+    } else if (result.paymentIntent.status === 'succeeded') {
+      btn.innerText = '✅ ¡Pago Exitoso!';
+      btn.style.background = '#00ff88';
+      setTimeout(() => {
+        alert('¡Gracias! Tu pago fue procesado con éxito.');
+        closePaymentModal();
+        btn.disabled = false;
+        btn.innerText = '🔒 Procesar Pago Seguro';
+        btn.style.background = 'linear-gradient(135deg,var(--green),#00b359)';
+      }, 1000);
+    }
+  } catch (err) {
+    errorElement.textContent = err.message || 'Error al conectar con el servidor de pago.';
+    btn.disabled = false;
+    btn.innerText = '🔒 Procesar Pago Seguro';
+  }
+}
+
+// ─── CONFIGURACIÓN DEL CHAT ───
+const CHAT_BACKEND_URL = "/api/chat";
+
+// ─── METADATOS DE MÓDULOS ───
 const moduleMeta = {
   software:{icon:'💻',label:'Custom Software'},
   web:{icon:'🌐',label:'Web Development'},
@@ -935,7 +1163,7 @@ function relatedHTML(ids){
   return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
 }
 
-// ─── MODAL DATA ───
+// ─── CONTENIDO DE MODALES ───
 const modals = {
   software:`
     <h2>💻 Custom Software Development</h2>
@@ -955,7 +1183,7 @@ const modals = {
       <tr><td>Base de Datos</td><td>PostgreSQL / MongoDB</td><td><span class="badge green">Producción</span></td></tr>
       <tr><td>Cloud</td><td>AWS / Azure</td><td><span class="badge green">Alta Disponibilidad</span></td></tr>
     </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a><button class="btn-outline" onclick="closeModal();openChat()">💬 Preguntar a IA</button></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Custom Software')">💳 Pagar Anticipo</button><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a></div>
     ${relatedHTML(['ai','cloud','helpdesk'])}
   `,
   web:`
@@ -975,7 +1203,7 @@ const modals = {
       <tr><td>E-commerce</td><td>6-10 semanas</td><td><span class="badge green">Retail</span></td></tr>
       <tr><td>Web App a Medida</td><td>8-16 semanas</td><td><span class="badge green">SaaS</span></td></tr>
     </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar mi sitio</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Web Development')">💳 Pagar Servicio Web</button><a href="sms:+13853949996" class="btn-primary">📲 Cotizar mi sitio</a></div>
     ${relatedHTML(['pos','cybersecurity','cloud'])}
   `,
   pos:`
@@ -988,12 +1216,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR, pagos móviles (Apple Pay, Google Pay) y BNPL desde una sola terminal.</p></div>
       <div class="m-feat"><span class="mf-icon">📦</span><h4>Inventario Inteligente</h4><p>Control de stock con alertas de reabasto, gestión de proveedores y código de barras/QR.</p></div>
     </div>
-    <h4 style="color:var(--neon);margin:25px 0 15px;font-family:'Syne',sans-serif">Industrias que atendemos</h4>
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🍕</span><h4>Restaurantes & Food</h4><p>Gestión de mesas, comandas digitales, cocina en pantalla y propinas integradas.</p></div>
-      <div class="m-feat"><span class="mf-icon">👕</span><h4>Retail & Boutique</h4><p>Tallas, colores, variantes y programas de lealtad para tiendas físicas y online.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Demo Gratuita</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('POS System')">💳 Comprar / Suscribir POS</button></div>
     ${relatedHTML(['hw_enterprise','web','helpdesk'])}
   `,
   mobile:`
@@ -1006,7 +1229,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">⚛️</span><h4>React Native</h4><p>Una base de código para ambas plataformas. Ideal para reducir costos sin sacrificar calidad.</p></div>
       <div class="m-feat"><span class="mf-icon">🔔</span><h4>Push & Engagement</h4><p>Notificaciones inteligentes, deep linking, analytics de comportamiento y onboarding optimizado.</p></div>
     </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar App</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Mobile App')">💳 Pagar Anticipo App</button></div>
     ${relatedHTML(['ai','cloud','cybersecurity'])}
   `,
   ai:`
@@ -1016,8 +1239,6 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">💬</span><h4>Chatbots & Agentes</h4><p>Asistentes IA entrenados en tu base de conocimiento para atención al cliente 24/7 sin costo operativo.</p></div>
       <div class="m-feat"><span class="mf-icon">👁️</span><h4>Visión por Computadora</h4><p>Control de calidad automatizado, reconocimiento de documentos y análisis visual en tiempo real.</p></div>
-      <div class="m-feat"><span class="mf-icon">📄</span><h4>Procesamiento de Documentos</h4><p>Extracción automática de datos de facturas, contratos y formularios con 99%+ de precisión.</p></div>
-      <div class="m-feat"><span class="mf-icon">📊</span><h4>Analítica Predictiva</h4><p>Modelos de ML que predicen demanda, detectan fraude y optimizan tu supply chain.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi caso</a></div>
     ${relatedHTML(['software','cloud','helpdesk'])}
@@ -1026,12 +1247,6 @@ const modals = {
     <h2>☁️ Cloud & DevOps</h2>
     <p class="m-sub">Infraestructura moderna que escala contigo. Pipelines automatizados para entregar software más rápido y con mayor confiabilidad.</p>
     <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Cloud" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🐳</span><h4>Contenedores & K8s</h4><p>Microservicios en Docker y orquestación con Kubernetes para máxima escalabilidad y resiliencia.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔄</span><h4>CI/CD Pipelines</h4><p>GitHub Actions, GitLab CI y ArgoCD para despliegues automáticos, seguros y reversibles.</p></div>
-      <div class="m-feat"><span class="mf-icon">📡</span><h4>Monitoreo 24/7</h4><p>Grafana, Prometheus y alertas proactivas para detectar problemas antes que tus usuarios.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔒</span><h4>IaC & Seguridad</h4><p>Terraform, Vault y políticas de seguridad como código para infraestructura reproducible y auditada.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Consultar</a></div>
     ${relatedHTML(['cybersecurity','hw_enterprise','helpdesk'])}
   `,
@@ -1039,18 +1254,6 @@ const modals = {
     <h2>🛡️ Ciberseguridad Digital</h2>
     <p class="m-sub">La mejor tecnología no sirve de nada sin protección. Auditamos, blindamos y monitoreamos tu software y datos contra amenazas reales, 24/7.</p>
     <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Ciberseguridad Digital" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🕵️</span><h4>Pentesting & Auditorías</h4><p>Simulamos ataques reales a tus sistemas para encontrar vulnerabilidades antes que los hackers.</p></div>
-      <div class="m-feat"><span class="mf-icon">🧠</span><h4>SOC 24/7</h4><p>Centro de operaciones de seguridad con monitoreo continuo, detección y respuesta a incidentes en tiempo real.</p></div>
-      <div class="m-feat"><span class="mf-icon">📋</span><h4>Cumplimiento Normativo</h4><p>Te ayudamos a cumplir con HIPAA, PCI-DSS, SOC 2 y otras regulaciones según tu industria.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔐</span><h4>Cifrado & Gestión de Accesos</h4><p>Cifrado extremo a extremo, autenticación multifactor y políticas de mínimo privilegio.</p></div>
-    </div>
-    <table class="m-table">
-      <tr><th>Servicio</th><th>Frecuencia</th><th>Nivel</th></tr>
-      <tr><td>Escaneo de Vulnerabilidades</td><td>Semanal</td><td><span class="badge green">Incluido</span></td></tr>
-      <tr><td>Pentesting Completo</td><td>Trimestral</td><td><span class="badge blue">Recomendado</span></td></tr>
-      <tr><td>Respuesta a Incidentes</td><td>24/7</td><td><span class="badge green">Prioritario</span></td></tr>
-    </table>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi negocio</a></div>
     ${relatedHTML(['hw_security','software','helpdesk'])}
   `,
@@ -1058,58 +1261,27 @@ const modals = {
     <h2>🎧 Soporte & Helpdesk</h2>
     <p class="m-sub">Un equipo técnico disponible cuando lo necesitas, para que tú te enfoques en tu negocio y nosotros en que la tecnología nunca te detenga.</p>
     <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Soporte Helpdesk" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">⏱️</span><h4>SLA Garantizado</h4><p>Tiempos de respuesta desde 15 minutos para incidencias críticas, con escalamiento automático.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>Soporte Remoto</h4><p>Acceso remoto seguro a equipos y servidores para resolver problemas sin esperar visitas presenciales.</p></div>
-      <div class="m-feat"><span class="mf-icon">📚</span><h4>Base de Conocimiento</h4><p>Documentación y tickets centralizados para que tu equipo aprenda a resolver lo básico por sí mismo.</p></div>
-      <div class="m-feat"><span class="mf-icon">📈</span><h4>Reportes Mensuales</h4><p>Métricas claras de incidencias resueltas, tiempos de respuesta y salud general de tu infraestructura.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Ver Planes de Soporte</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Soporte Tecnico')">💳 Pagar Plan de Soporte</button></div>
     ${relatedHTML(['cybersecurity','hw_enterprise','software'])}
   `,
   hw_enterprise:`
     <h2>🏢 Equipos para Empresa</h2>
     <p class="m-sub">Infraestructura crítica configurada y lista para producción. Proveemos, instalamos y mantenemos hardware de grado empresarial en Utah.</p>
     <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Enterprise" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>Servidores</h4><p>Dell PowerEdge, HP ProLiant configurados para virtualización VMware/Proxmox, base de datos o aplicaciones.</p></div>
-      <div class="m-feat"><span class="mf-icon">💼</span><h4>Workstations</h4><p>Para arquitectos, ingenieros, diseñadores 3D y analistas de datos. RTX 4090, Xeon y 128GB+ RAM.</p></div>
-      <div class="m-feat"><span class="mf-icon">💿</span><h4>NAS & Backups</h4><p>Synology y QNAP para almacenamiento masivo, respaldos automáticos y replicación offsite.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔌</span><h4>UPS & Energía</h4><p>Sistemas de alimentación ininterrumpida APC y Eaton para proteger equipos críticos.</p></div>
-    </div>
-    <table class="m-table">
-      <tr><th>Marca</th><th>Categoría</th><th>Stock</th></tr>
-      <tr><td>Dell EMC</td><td>Servidores & Storage</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>HP Enterprise</td><td>Servidores & Switches</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>Synology</td><td>NAS & Backup</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>Cisco</td><td>Networking Enterprise</td><td><span class="badge blue">Por pedido</span></td></tr>
-    </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Hardware / Equipos')">💳 Pagar Factura Hardware</button></div>
     ${relatedHTML(['hw_networking','hw_security','cloud'])}
   `,
   hw_home:`
     <h2>🏠 Equipos para Casa & Home Office</h2>
     <p class="m-sub">Tecnología premium para tu productividad y entretenimiento. Configuraciones equilibradas y potentes a tu medida.</p>
     <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Home PC" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">💻</span><h4>Laptops de Alta Gama</h4><p>MacBook Pro, Dell XPS, ASUS ROG Zephyrus. Selección y configuración personalizada según tu uso.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>PC Desktop a Medida</h4><p>Ensamblamos PCs optimizados para gaming, edición de video 4K, modelado 3D u ofimática avanzada.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖱️</span><h4>Periféricos Premium</h4><p>Monitores 4K/144Hz, teclados mecánicos, sillas ergonómicas y audio profesional para tu setup.</p></div>
-      <div class="m-feat"><span class="mf-icon">🎮</span><h4>Gaming Rigs</h4><p>Builds enteras con gestión de cables, RGB sincronizado y refrigeración líquida custom.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Armar mi PC</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Hardware / Equipos')">💳 Pagar PC / Equipo</button></div>
     ${relatedHTML(['hw_networking','hw_av','helpdesk'])}
   `,
   hw_networking:`
     <h2>🌐 Redes & Conectividad Profesional</h2>
     <p class="m-sub">La columna vertebral de cualquier entorno digital. Diseñamos, instalamos y mantenemos redes rápidas, seguras y estables.</p>
     <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Networking" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📡</span><h4>WiFi 7 Mesh</h4><p>Cobertura total sin puntos ciegos para empresas y residencias grandes. Ubiquiti UniFi y Cisco Meraki.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔌</span><h4>Cableado Estructurado</h4><p>Cat6A y fibra óptica certificados para velocidades de hasta 10Gbps en toda la instalación.</p></div>
-      <div class="m-feat"><span class="mf-icon">🛡️</span><h4>Firewalls Empresariales</h4><p>Fortinet, pfSense y Ubiquiti para segmentación de red, IPS/IDS y VPN site-to-site.</p></div>
-      <div class="m-feat"><span class="mf-icon">📊</span><h4>Monitoreo de Red</h4><p>PRTG, Zabbix y dashboards personalizados para visibilidad total del tráfico y alertas proactivas.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi red</a></div>
     ${relatedHTML(['hw_security','hw_av','cybersecurity'])}
   `,
@@ -1117,12 +1289,6 @@ const modals = {
     <h2>🔒 Ciberseguridad & Vigilancia</h2>
     <p class="m-sub">Protección integral física y digital. Desde sistemas de videovigilancia IP hasta seguridad perimetral de red empresarial.</p>
     <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Security" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📹</span><h4>CCTV IP & NVR</h4><p>Cámaras 4K con visión nocturna, reconocimiento de personas y acceso remoto desde tu celular.</p></div>
-      <div class="m-feat"><span class="mf-icon">🚪</span><h4>Control de Acceso</h4><p>Lectores biométricos, tarjetas RFID y cerraduras electrónicas con registro de entradas/salidas.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔐</span><h4>VPN Empresarial</h4><p>Acceso remoto seguro para empleados remotos con autenticación multifactor y cifrado AES-256.</p></div>
-      <div class="m-feat"><span class="mf-icon">🛡️</span><h4>Endpoint Security</h4><p>Antivirus empresarial, EDR y gestión centralizada de dispositivos con respuesta automática a amenazas.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi seguridad</a></div>
     ${relatedHTML(['cybersecurity','hw_networking','hw_av'])}
   `,
@@ -1130,12 +1296,6 @@ const modals = {
     <h2>🖥️ Audio/Video & Salas de Juntas</h2>
     <p class="m-sub">Convierte cualquier sala en un espacio de colaboración de nivel mundial. Videoconferencia nítida, audio profesional y control con un solo toque.</p>
     <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Sala de juntas inteligente" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📹</span><h4>Videoconferencia 4K</h4><p>Cámaras con seguimiento automático y cancelación de ruido para reuniones híbridas sin fricciones.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖱️</span><h4>Pantallas Táctiles Interactivas</h4><p>Pizarras digitales para colaboración en tiempo real entre equipos remotos y presenciales.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔊</span><h4>Audio Profesional</h4><p>Micrófonos de techo y parlantes calibrados para que cada palabra se escuche con claridad.</p></div>
-      <div class="m-feat"><span class="mf-icon">📲</span><h4>Control Unificado</h4><p>Integración con Zoom, Teams y Google Meet, controlado desde una sola tablet en la sala.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Equipar mi sala</a></div>
     ${relatedHTML(['hw_networking','hw_enterprise','helpdesk'])}
   `
@@ -1152,7 +1312,7 @@ function closeModal(){
 }
 function handleModalClick(e){if(e.target===document.getElementById('modal'))closeModal()}
 
-// ─── MENU ───
+// ─── MENÚ NAVEGACIÓN ───
 function toggleMenu(){
   const menu = document.getElementById('mobile-menu');
   const btn = document.querySelector('.hamburger');
@@ -1162,7 +1322,7 @@ function toggleMenu(){
   if(btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
-// ─── CHAT ───
+// ─── CHATBOT ───
 let chatOpen = false;
 function openChat(){document.getElementById('chat-box').style.display='flex';chatOpen=true;document.getElementById('chat-input').focus();}
 function closeChat(){document.getElementById('chat-box').style.display='none';chatOpen=false;}
@@ -1185,7 +1345,7 @@ async function sendMsg(){
     });
     if(!res.ok) throw new Error('backend error');
     const data = await res.json();
-    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos al (385) 394-9996.';
+    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos directamente al +1 (385) 394-9996.';
     typing.remove();
     addBubble(reply,'bot');
     saveHistory(txt, reply);
@@ -1212,7 +1372,7 @@ function addBubble(text, cls){
   return d;
 }
 
-// ─── SCROLL ANIMATIONS ───
+// ─── ANIMACIONES AL SCROLLEAR ───
 const obs = new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
 },{threshold:.12});
