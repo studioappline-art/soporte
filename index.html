@@ -1025,7 +1025,6 @@ footer p{color:var(--sub);font-size:.85rem}
 
 <script>
 // ─── CONFIGURACIÓN DE STRIPE ───
-// Clave pública de prueba asignada
 const STRIPE_PUBLIC_KEY = "pk_test_TYooA4J0D25a38QM92qBf41n"; 
 let stripe, cardElement;
 
@@ -1097,7 +1096,7 @@ async function handlePaymentSubmit(e) {
   const amount = document.getElementById('pay-amount').value;
 
   try {
-    // Llama al endpoint de tu backend que genera el PaymentIntent
+    // 1. Obtener PaymentIntent desde la API backend
     const response = await fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1107,10 +1106,10 @@ async function handlePaymentSubmit(e) {
     const data = await response.json();
 
     if (!data.clientSecret) {
-      throw new Error(data.error || 'No se pudo generar la transacción. Asegúrate de configurar tu backend.');
+      throw new Error(data.error || 'No se pudo generar el intento de pago.');
     }
 
-    // Confirma el pago mediante Stripe Elements
+    // 2. Confirmación de pago segura con Stripe SDK
     const result = await stripe.confirmCardPayment(data.clientSecret, {
       payment_method: {
         card: cardElement,
@@ -1122,7 +1121,7 @@ async function handlePaymentSubmit(e) {
       errorElement.textContent = result.error.message;
       btn.disabled = false;
       btn.innerText = '🔒 Procesar Pago Seguro';
-    } else if (result.paymentIntent.status === 'succeeded') {
+    } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
       btn.innerText = '✅ ¡Pago Exitoso!';
       btn.style.background = '#00ff88';
       setTimeout(() => {
@@ -1140,7 +1139,7 @@ async function handlePaymentSubmit(e) {
   }
 }
 
-// ─── CONFIGURACIÓN DEL CHAT ───
+// ─── CONFIGURACIÓN DEL CHATBOT ───
 const CHAT_BACKEND_URL = "/api/chat";
 
 // ─── METADATOS DE MÓDULOS ───
@@ -1159,6 +1158,7 @@ const moduleMeta = {
   hw_security:{icon:'🔒',label:'Ciberseguridad Física'},
   hw_av:{icon:'🖥️',label:'Audio/Video & Salas'}
 };
+
 function relatedHTML(ids){
   return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
 }
@@ -1302,15 +1302,19 @@ const modals = {
 };
 
 function openModal(id){
-  document.getElementById('modal-body').innerHTML = modals[id]||'<h2>Próximamente</h2>';
+  document.getElementById('modal-body').innerHTML = modals[id] || '<h2>Próximamente</h2>';
   document.getElementById('modal').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow = 'hidden';
 }
+
 function closeModal(){
   document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow='auto';
+  document.body.style.overflow = 'auto';
 }
-function handleModalClick(e){if(e.target===document.getElementById('modal'))closeModal()}
+
+function handleModalClick(e){
+  if(e.target === document.getElementById('modal')) closeModal();
+}
 
 // ─── MENÚ NAVEGACIÓN ───
 function toggleMenu(){
@@ -1322,44 +1326,31 @@ function toggleMenu(){
   if(btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
-// ─── CHATBOT ───
+// ─── LÓGICA CHATBOT ───
 let chatOpen = false;
-function openChat(){document.getElementById('chat-box').style.display='flex';chatOpen=true;document.getElementById('chat-input').focus();}
-function closeChat(){document.getElementById('chat-box').style.display='none';chatOpen=false;}
-function toggleChat(){chatOpen?closeChat():openChat()}
 
-async function sendMsg(){
-  const inp = document.getElementById('chat-input');
-  const txt = inp.value.trim();
-  if(!txt) return;
-  inp.value='';
-  addBubble(txt,'user');
-  const typing = addBubble('Escribiendo...','bot typing');
+function openChat(){
+  document.getElementById('chat-box').style.display = 'flex';
+  chatOpen = true;
+  document.getElementById('chat-input').focus();
+}
 
-  try {
-    const history = getHistory();
-    const res = await fetch(CHAT_BACKEND_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ message: txt, history })
-    });
-    if(!res.ok) throw new Error('backend error');
-    const data = await res.json();
-    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos directamente al +1 (385) 394-9996.';
-    typing.remove();
-    addBubble(reply,'bot');
-    saveHistory(txt, reply);
-  } catch(e){
-    typing.remove();
-    addBubble('Parece que hay un problema de conexión. Contáctanos directamente al (385) 394-9996 📲','bot');
-  }
+function closeChat(){
+  document.getElementById('chat-box').style.display = 'none';
+  chatOpen = false;
+}
+
+function toggleChat(){
+  chatOpen ? closeChat() : openChat();
 }
 
 let msgHistory = [];
+
 function saveHistory(user, bot){
-  msgHistory.push({role:'user',content:user},{role:'assistant',content:bot});
+  msgHistory.push({role:'user', content:user}, {role:'assistant', content:bot});
   if(msgHistory.length > 12) msgHistory = msgHistory.slice(-12);
 }
+
 function getHistory(){ return msgHistory; }
 
 function addBubble(text, cls){
@@ -1372,11 +1363,44 @@ function addBubble(text, cls){
   return d;
 }
 
-// ─── ANIMACIONES AL SCROLLEAR ───
-const obs = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
-},{threshold:.12});
-document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+async function sendMsg(){
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value = '';
+  addBubble(txt, 'user');
+  const typing = addBubble('Escribiendo...', 'bot typing');
+
+  try {
+    const history = getHistory();
+    const res = await fetch(CHAT_BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: txt, history })
+    });
+    
+    if(!res.ok) throw new Error('backend error');
+    
+    const data = await res.json();
+    const reply = data.reply || 'Lo siento, hubo un error procesando la consulta. Contáctanos al +1 (385) 394-9996.';
+    
+    typing.remove();
+    addBubble(reply, 'bot');
+    saveHistory(txt, reply);
+  } catch(e) {
+    typing.remove();
+    addBubble('Parece que hay un problema de conexión temporal. Contáctanos directamente por SMS al (385) 394-9996 📲', 'bot');
+  }
+}
+
+// ─── ANIMACIONES DE SCROLL ───
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: .12 });
+
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 </script>
 </body>
 </html>
