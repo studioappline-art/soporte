@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#050c1f">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- STRIPE SDK -->
-<script src="https://js.stripe.com/v3/"></script>
+<!-- PAYPAL SDK (Reemplazar 'test' por tu Client-ID de producción cuando estés listo) -->
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
 
 <style>
 :root {
@@ -391,7 +391,7 @@ section{padding:100px 0}
 }
 .modal-close:hover{background:rgba(79,195,255,.15);transform:rotate(90deg)}
 
-/* ESTILOS FORMULARIO DE PAGO */
+/* ESTILOS FORMULARIO DE PAGO PAYPAL */
 .pay-form-group {
   margin-bottom: 20px;
 }
@@ -420,16 +420,9 @@ section{padding:100px 0}
   border-color: var(--neon);
   box-shadow: 0 0 10px rgba(79,195,255,0.2);
 }
-#card-element {
-  background: rgba(255,255,255,0.05);
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-#card-errors {
-  color: #ff5555;
-  font-size: 0.85rem;
-  margin-top: 10px;
+#paypal-button-container {
+  margin-top: 20px;
+  min-height: 150px;
 }
 
 #modal-body h2{
@@ -658,7 +651,7 @@ footer p{color:var(--sub);font-size:.85rem}
       <div class="feat-item"><span class="feat-icon">⚡</span><h4>Alta Performance</h4><p>Infraestructura optimizada para velocidad y disponibilidad máxima.</p></div>
       <div class="feat-item"><span class="feat-icon">🤖</span><h4>IA Integrada</h4><p>Automatizamos procesos con modelos de IA de última generación.</p></div>
       <div class="feat-item"><span class="feat-icon">📍</span><h4>Local Utah</h4><p>Soporte presencial en Utah con respuesta en menos de 4 horas.</p></div>
-      <div class="feat-item"><span class="feat-icon">☁️</span><h4>Cloud Ready</h4><p>Arquitecturas escalables en AWS, Azure y Google Cloud.</p></div>
+      <div class="feat-item"><span class="feat-icon">☁️</span><h4>Cloud Ready</h4><p>ArquITECTURAS escalables en AWS, Azure y Google Cloud.</p></div>
     </div>
   </div>
 </div>
@@ -951,14 +944,14 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </div>
 
-<!-- MODAL DE PAGO STRIPE -->
+<!-- MODAL DE PAGO PAYPAL -->
 <div id="payment-modal" class="modal" onclick="handlePayModalClick(event)">
   <div class="modal-inner" style="max-width:550px;">
     <button class="modal-close" onclick="closePaymentModal()" aria-label="Cerrar">×</button>
     <h2>💳 Portal de Pagos</h2>
-    <p class="m-sub">Procesamiento seguro con cifrado de grado bancario (Stripe)</p>
+    <p class="m-sub">Procesamiento seguro directo con PayPal</p>
 
-    <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
+    <form id="payment-form" onsubmit="event.preventDefault();">
       <div class="pay-form-group">
         <label for="pay-name">Nombre completo</label>
         <input type="text" id="pay-name" required placeholder="Ej. Marcos Torres">
@@ -987,14 +980,10 @@ footer p{color:var(--sub);font-size:.85rem}
       </div>
 
       <div class="pay-form-group">
-        <label>Información de Tarjeta</label>
-        <div id="card-element"></div>
-        <div id="card-errors" role="alert"></div>
+        <label>Método de Pago Seguro</label>
+        <!-- Contenedor del Botón Inteligente de PayPal -->
+        <div id="paypal-button-container"></div>
       </div>
-
-      <button type="submit" id="pay-submit-btn" class="btn-pay" style="width:100%;justify-content:center;margin-top:10px;">
-        🔒 Procesar Pago Seguro
-      </button>
     </form>
   </div>
 </div>
@@ -1024,42 +1013,58 @@ footer p{color:var(--sub);font-size:.85rem}
 </div>
 
 <script>
-// ─── CONFIGURACIÓN DE STRIPE ───
-const STRIPE_PUBLIC_KEY = "pk_test_TYooA4J0D25a38QM92qBf41n"; 
-let stripe, cardElement;
+// ─── CONFIGURACIÓN DE PAYPAL ───
+let paypalButtonsRendered = false;
 
-if (typeof Stripe !== 'undefined') {
-  stripe = Stripe(STRIPE_PUBLIC_KEY);
-  const elements = stripe.elements();
-  
-  cardElement = elements.create('card', {
+function renderPayPalButtons() {
+  if (paypalButtonsRendered) return;
+
+  paypal.Buttons({
     style: {
-      base: {
-        color: '#e8f4ff',
-        fontFamily: "'Inter', sans-serif",
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': { color: '#7ba8d4' }
-      },
-      invalid: {
-        color: '#ff5555',
-        iconColor: '#ff5555'
+      layout: 'vertical',
+      color:  'gold',
+      shape:  'rect',
+      label:  'paypal'
+    },
+    createOrder: function(data, actions) {
+      const name = document.getElementById('pay-name').value;
+      const email = document.getElementById('pay-email').value;
+      const service = document.getElementById('pay-service').value;
+      const amountVal = document.getElementById('pay-amount').value;
+
+      if (!name || !email || !amountVal || parseFloat(amountVal) <= 0) {
+        alert('Por favor, completa correctamente todos los campos del formulario antes de continuar.');
+        return;
       }
+
+      return actions.order.create({
+        purchase_units: [{
+          description: `Servicio Appline Studio: ${service} - Cliente: ${name}`,
+          amount: {
+            currency_code: 'USD',
+            value: parseFloat(amountVal).toFixed(2)
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert('¡Gracias, ' + details.payer.name.given_name + '! Tu pago fue procesado con éxito.');
+        closePaymentModal();
+      });
+    },
+    onError: function (err) {
+      console.error('Error de PayPal:', err);
+      alert('Ocurrió un error al procesar el pago con PayPal. Intenta de nuevo.');
     }
-  });
+  }).render('#paypal-button-container');
+
+  paypalButtonsRendered = true;
 }
 
 function openPaymentModal(serviceName = '') {
   document.getElementById('payment-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
-  
-  if (cardElement && !document.getElementById('card-element').hasChildNodes()) {
-    cardElement.mount('#card-element');
-    cardElement.on('change', function(event) {
-      const displayError = document.getElementById('card-errors');
-      displayError.textContent = event.error ? event.error.message : '';
-    });
-  }
 
   if (serviceName) {
     const select = document.getElementById('pay-service');
@@ -1070,6 +1075,9 @@ function openPaymentModal(serviceName = '') {
       }
     }
   }
+
+  // Inicializar botones de PayPal al abrir el modal
+  renderPayPalButtons();
 }
 
 function closePaymentModal() {
@@ -1081,65 +1089,7 @@ function handlePayModalClick(e) {
   if (e.target === document.getElementById('payment-modal')) closePaymentModal();
 }
 
-async function handlePaymentSubmit(e) {
-  e.preventDefault();
-  const btn = document.getElementById('pay-submit-btn');
-  const errorElement = document.getElementById('card-errors');
-  errorElement.textContent = '';
-  
-  btn.disabled = true;
-  btn.innerText = '⏳ Procesando pago...';
-
-  const name = document.getElementById('pay-name').value;
-  const email = document.getElementById('pay-email').value;
-  const service = document.getElementById('pay-service').value;
-  const amount = document.getElementById('pay-amount').value;
-
-  try {
-    // 1. Obtener PaymentIntent desde la API backend
-    const response = await fetch('/api/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: parseFloat(amount) * 100, currency: 'usd', name, email, service })
-    });
-
-    const data = await response.json();
-
-    if (!data.clientSecret) {
-      throw new Error(data.error || 'No se pudo generar el intento de pago.');
-    }
-
-    // 2. Confirmación de pago segura con Stripe SDK
-    const result = await stripe.confirmCardPayment(data.clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: { name, email }
-      }
-    });
-
-    if (result.error) {
-      errorElement.textContent = result.error.message;
-      btn.disabled = false;
-      btn.innerText = '🔒 Procesar Pago Seguro';
-    } else if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-      btn.innerText = '✅ ¡Pago Exitoso!';
-      btn.style.background = '#00ff88';
-      setTimeout(() => {
-        alert('¡Gracias! Tu pago fue procesado con éxito.');
-        closePaymentModal();
-        btn.disabled = false;
-        btn.innerText = '🔒 Procesar Pago Seguro';
-        btn.style.background = 'linear-gradient(135deg,var(--green),#00b359)';
-      }, 1000);
-    }
-  } catch (err) {
-    errorElement.textContent = err.message || 'Error al conectar con el servidor de pago.';
-    btn.disabled = false;
-    btn.innerText = '🔒 Procesar Pago Seguro';
-  }
-}
-
-// ─── CONFIGURACIÓN DEL CHATBOT ───
+// ─── CONFIGURACIÓN DEL CHAT ───
 const CHAT_BACKEND_URL = "/api/chat";
 
 // ─── METADATOS DE MÓDULOS ───
@@ -1158,7 +1108,6 @@ const moduleMeta = {
   hw_security:{icon:'🔒',label:'Ciberseguridad Física'},
   hw_av:{icon:'🖥️',label:'Audio/Video & Salas'}
 };
-
 function relatedHTML(ids){
   return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
 }
@@ -1172,7 +1121,7 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">🏗️</span><h4>ERP a Medida</h4><p>Gestión integral de recursos: inventario, RRHH, finanzas y producción en una plataforma unificada.</p></div>
       <div class="m-feat"><span class="mf-icon">👥</span><h4>CRM Inteligente</h4><p>Pipeline de ventas con automatización, scoring de leads y analytics predictivo para maximizar conversiones.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔗</span><h4>Integraciones API</h4><p>Conectamos tu software con Stripe, QuickBooks, SAP, Salesforce y cientos de servicios externos.</p></div>
+      <div class="m-feat"><span class="mf-icon">🔗</span><h4>Integraciones API</h4><p>Conectamos tu software con PayPal, QuickBooks, SAP, Salesforce y cientos de servicios externos.</p></div>
       <div class="m-feat"><span class="mf-icon">📊</span><h4>Dashboards BI</h4><p>Visualizaciones en tiempo real de tus KPIs críticos con alertas automáticas y reportes ejecutivos.</p></div>
     </div>
     <h4 style="color:var(--neon);margin:25px 0 15px;font-family:'Syne',sans-serif">Stack Tecnológico</h4>
@@ -1213,7 +1162,7 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">☁️</span><h4>Multicloud Sync</h4><p>Accede a ventas, inventario y empleados desde cualquier dispositivo en tiempo real.</p></div>
       <div class="m-feat"><span class="mf-icon">📈</span><h4>Reportes Avanzados</h4><p>Dashboard ejecutivo con ventas por hora, productos top, márgenes y proyecciones automáticas.</p></div>
-      <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR, pagos móviles (Apple Pay, Google Pay) y BNPL desde una sola terminal.</p></div>
+      <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR y pagos digitales a través de PayPal desde una sola terminal.</p></div>
       <div class="m-feat"><span class="mf-icon">📦</span><h4>Inventario Inteligente</h4><p>Control de stock con alertas de reabasto, gestión de proveedores y código de barras/QR.</p></div>
     </div>
     <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('POS System')">💳 Comprar / Suscribir POS</button></div>
@@ -1302,19 +1251,15 @@ const modals = {
 };
 
 function openModal(id){
-  document.getElementById('modal-body').innerHTML = modals[id] || '<h2>Próximamente</h2>';
+  document.getElementById('modal-body').innerHTML = modals[id]||'<h2>Próximamente</h2>';
   document.getElementById('modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-
 function closeModal(){
   document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow = 'auto';
+  document.body.style.overflow='auto';
 }
-
-function handleModalClick(e){
-  if(e.target === document.getElementById('modal')) closeModal();
-}
+function handleModalClick(e){if(e.target===document.getElementById('modal'))closeModal()}
 
 // ─── MENÚ NAVEGACIÓN ───
 function toggleMenu(){
@@ -1326,31 +1271,44 @@ function toggleMenu(){
   if(btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
-// ─── LÓGICA CHATBOT ───
+// ─── CHATBOT ───
 let chatOpen = false;
+function openChat(){document.getElementById('chat-box').style.display='flex';chatOpen=true;document.getElementById('chat-input').focus();}
+function closeChat(){document.getElementById('chat-box').style.display='none';chatOpen=false;}
+function toggleChat(){chatOpen?closeChat():openChat()}
 
-function openChat(){
-  document.getElementById('chat-box').style.display = 'flex';
-  chatOpen = true;
-  document.getElementById('chat-input').focus();
-}
+async function sendMsg(){
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value='';
+  addBubble(txt,'user');
+  const typing = addBubble('Escribiendo...','bot typing');
 
-function closeChat(){
-  document.getElementById('chat-box').style.display = 'none';
-  chatOpen = false;
-}
-
-function toggleChat(){
-  chatOpen ? closeChat() : openChat();
+  try {
+    const history = getHistory();
+    const res = await fetch(CHAT_BACKEND_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ message: txt, history })
+    });
+    if(!res.ok) throw new Error('backend error');
+    const data = await res.json();
+    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos directamente al +1 (385) 394-9996.';
+    typing.remove();
+    addBubble(reply,'bot');
+    saveHistory(txt, reply);
+  } catch(e){
+    typing.remove();
+    addBubble('Parece que hay un problema de conexión. Contáctanos directamente al (385) 394-9996 📲','bot');
+  }
 }
 
 let msgHistory = [];
-
 function saveHistory(user, bot){
-  msgHistory.push({role:'user', content:user}, {role:'assistant', content:bot});
+  msgHistory.push({role:'user',content:user},{role:'assistant',content:bot});
   if(msgHistory.length > 12) msgHistory = msgHistory.slice(-12);
 }
-
 function getHistory(){ return msgHistory; }
 
 function addBubble(text, cls){
@@ -1363,44 +1321,11 @@ function addBubble(text, cls){
   return d;
 }
 
-async function sendMsg(){
-  const inp = document.getElementById('chat-input');
-  const txt = inp.value.trim();
-  if(!txt) return;
-  inp.value = '';
-  addBubble(txt, 'user');
-  const typing = addBubble('Escribiendo...', 'bot typing');
-
-  try {
-    const history = getHistory();
-    const res = await fetch(CHAT_BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: txt, history })
-    });
-    
-    if(!res.ok) throw new Error('backend error');
-    
-    const data = await res.json();
-    const reply = data.reply || 'Lo siento, hubo un error procesando la consulta. Contáctanos al +1 (385) 394-9996.';
-    
-    typing.remove();
-    addBubble(reply, 'bot');
-    saveHistory(txt, reply);
-  } catch(e) {
-    typing.remove();
-    addBubble('Parece que hay un problema de conexión temporal. Contáctanos directamente por SMS al (385) 394-9996 📲', 'bot');
-  }
-}
-
-// ─── ANIMACIONES DE SCROLL ───
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if(e.isIntersecting) e.target.classList.add('visible');
-  });
-}, { threshold: .12 });
-
-document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+// ─── ANIMACIONES AL SCROLLEAR ───
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.12});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
