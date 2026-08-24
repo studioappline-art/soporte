@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#050c1f">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- PAYPAL SDK (Reemplazar 'test' por tu Client-ID de producción cuando estés listo) -->
-<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+<!-- STRIPE SDK -->
+<script src="https://js.stripe.com/v3/"></script>
 
 <style>
 :root {
@@ -391,7 +391,7 @@ section{padding:100px 0}
 }
 .modal-close:hover{background:rgba(79,195,255,.15);transform:rotate(90deg)}
 
-/* ESTILOS FORMULARIO DE PAGO PAYPAL */
+/* ESTILOS FORMULARIO DE PAGO */
 .pay-form-group {
   margin-bottom: 20px;
 }
@@ -420,9 +420,16 @@ section{padding:100px 0}
   border-color: var(--neon);
   box-shadow: 0 0 10px rgba(79,195,255,0.2);
 }
-#paypal-button-container {
-  margin-top: 20px;
-  min-height: 150px;
+#card-element {
+  background: rgba(255,255,255,0.05);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+#card-errors {
+  color: #ff5555;
+  font-size: 0.85rem;
+  margin-top: 10px;
 }
 
 #modal-body h2{
@@ -539,6 +546,165 @@ section{padding:100px 0}
 }
 .fab-sms:hover{transform:scale(1.08)}
 
+
+/* ─── LIVE WEBSITE PORTFOLIO ─── */
+.live-portfolio-section{
+  position:relative;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%,rgba(0,114,255,.08),transparent),
+    linear-gradient(180deg,rgba(5,12,31,.2),rgba(8,18,43,.55));
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.live-pf-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;
+}
+.live-pf-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:26px;
+  background:linear-gradient(145deg,rgba(10,31,68,.92),rgba(5,12,31,.96));
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:.45s cubic-bezier(.165,.84,.44,1);
+  box-shadow:0 18px 45px rgba(0,0,0,.22);
+}
+.live-pf-card:hover{
+  transform:translateY(-10px);
+  border-color:rgba(79,195,255,.5);
+  box-shadow:0 30px 65px rgba(0,0,0,.45),0 0 35px rgba(79,195,255,.09);
+}
+.live-pf-preview{
+  height:205px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(79,195,255,.16),transparent 30%),
+    linear-gradient(135deg,#071735,#0b2250);
+}
+.live-pf-preview::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(5,12,31,.9));
+  pointer-events:none;
+}
+.live-pf-browser{
+  position:absolute;
+  left:18px;right:18px;top:18px;
+  height:170px;
+  border-radius:15px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:#06112a;
+  box-shadow:0 18px 35px rgba(0,0,0,.4);
+  transform:translateY(8px);
+  transition:.5s;
+}
+.live-pf-card:hover .live-pf-browser{transform:translateY(2px) scale(1.015)}
+.live-pf-browserbar{
+  height:25px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 9px;
+  background:rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.live-pf-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35)}
+.live-pf-url{
+  margin-left:4px;
+  flex:1;
+  min-width:0;
+  color:rgba(232,244,255,.55);
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.live-pf-browserbody{
+  height:145px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:9px;
+  background:
+    linear-gradient(135deg,rgba(0,114,255,.12),rgba(0,242,254,.04)),
+    #071532;
+}
+.live-pf-browserbody .site-symbol{font-size:2.5rem;filter:drop-shadow(0 0 14px rgba(79,195,255,.3))}
+.live-pf-browserbody .site-loading{
+  width:90px;height:6px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden;
+}
+.live-pf-browserbody .site-loading::after{
+  content:'';display:block;width:55%;height:100%;
+  background:linear-gradient(90deg,var(--deep),var(--neon));
+  animation:liveLoad 1.8s ease-in-out infinite;
+}
+.live-pf-info{padding:23px}
+.live-pf-topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.live-pf-info h3{
+  font-family:'Syne',sans-serif;font-size:1.18rem;color:#fff;font-weight:700;
+}
+.live-pf-status{
+  font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+  color:var(--green);border:1px solid rgba(0,255,136,.2);
+  background:rgba(0,255,136,.07);padding:4px 9px;border-radius:50px;
+  white-space:nowrap;
+}
+.live-pf-info p{font-size:.84rem;color:var(--sub);margin-bottom:17px;min-height:42px}
+.live-pf-actions{display:flex;gap:9px;flex-wrap:wrap}
+.live-pf-btn{
+  border:1px solid var(--border);background:rgba(79,195,255,.06);
+  color:var(--text);border-radius:50px;padding:9px 14px;
+  font-size:.78rem;font-weight:600;cursor:pointer;transition:.3s;
+}
+.live-pf-btn.primary{
+  border:0;background:linear-gradient(135deg,var(--neon),var(--deep));color:#001020;
+}
+.live-pf-btn:hover{transform:translateY(-2px);border-color:var(--neon);color:var(--neon)}
+.live-pf-btn.primary:hover{color:#001020;box-shadow:0 8px 20px rgba(0,114,255,.3)}
+.live-pf-modal .modal-inner{
+  max-width:1250px;
+  padding:22px;
+  background:#040b1d;
+}
+.live-pf-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:15px;padding:3px 52px 16px 5px;
+}
+.live-pf-modal-title{
+  font-family:'Syne',sans-serif;font-size:1.2rem;color:#fff;
+}
+.live-pf-modal-url{font-size:.75rem;color:var(--sub);margin-top:3px;word-break:break-all}
+.live-pf-iframe-wrap{
+  position:relative;width:100%;height:min(72vh,760px);
+  min-height:480px;border-radius:18px;overflow:hidden;
+  border:1px solid var(--border);background:#06112a;
+}
+.live-pf-iframe{
+  width:100%;height:100%;border:0;background:#fff;
+}
+.live-pf-fallback{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:30px;
+  background:linear-gradient(135deg,#06112a,#081d43);
+}
+.live-pf-fallback.show{display:flex}
+.live-pf-fallback-icon{font-size:3rem;margin-bottom:14px}
+.live-pf-fallback h3{font-family:'Syne',sans-serif;color:#fff;margin-bottom:8px}
+.live-pf-fallback p{color:var(--sub);max-width:520px;margin-bottom:20px}
+@keyframes liveLoad{0%,100%{transform:translateX(-85%)}50%{transform:translateX(85%)}}
+@media(max-width:700px){
+  .live-pf-grid{grid-template-columns:1fr}
+  .live-pf-iframe-wrap{height:65vh;min-height:400px}
+  .live-pf-modal .modal-inner{padding:14px}
+  .live-pf-modal-head{padding-right:48px}
+}
+
 /* ─── FOOTER ─── */
 footer{
   background:#030912;border-top:1px solid var(--border);
@@ -598,7 +764,9 @@ footer p{color:var(--sub);font-size:.85rem}
     <li><a href="#software">Software</a></li>
     <li><a href="#team">Equipo</a></li>
     <li><a href="#hardware">Hardware</a></li>
-    <li><a href="#portfolio">Portafolio</a></li>
+    <li><a href="#portfolio">Portafolio</a>
+      <a href="#web-portfolio">Webs</a></li>
+    <li><a href="#web-portfolio">Webs</a></li>
     <li><a href="#repair">Soporte</a></li>
   </ul>
   <div style="display:flex;align-items:center;">
@@ -616,6 +784,7 @@ footer p{color:var(--sub);font-size:.85rem}
   <a href="#team" onclick="toggleMenu()">Equipo</a>
   <a href="#hardware" onclick="toggleMenu()">Hardware</a>
   <a href="#portfolio" onclick="toggleMenu()">Portafolio</a>
+  <a href="#web-portfolio" onclick="toggleMenu()">Webs</a>
   <a href="#repair" onclick="toggleMenu()">Soporte</a>
   <a href="javascript:void(0)" onclick="toggleMenu();openPaymentModal()" style="color:var(--green)">💳 Realizar Pago</a>
   <a href="sms:+13853949996" style="color:var(--neon)">💬 Enviar SMS</a>
@@ -651,7 +820,7 @@ footer p{color:var(--sub);font-size:.85rem}
       <div class="feat-item"><span class="feat-icon">⚡</span><h4>Alta Performance</h4><p>Infraestructura optimizada para velocidad y disponibilidad máxima.</p></div>
       <div class="feat-item"><span class="feat-icon">🤖</span><h4>IA Integrada</h4><p>Automatizamos procesos con modelos de IA de última generación.</p></div>
       <div class="feat-item"><span class="feat-icon">📍</span><h4>Local Utah</h4><p>Soporte presencial en Utah con respuesta en menos de 4 horas.</p></div>
-      <div class="feat-item"><span class="feat-icon">☁️</span><h4>Cloud Ready</h4><p>ArquITECTURAS escalables en AWS, Azure y Google Cloud.</p></div>
+      <div class="feat-item"><span class="feat-icon">☁️</span><h4>Cloud Ready</h4><p>Arquitecturas escalables en AWS, Azure y Google Cloud.</p></div>
     </div>
   </div>
 </div>
@@ -918,6 +1087,20 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </section>
 
+
+<!-- LIVE WEBSITE PORTFOLIO -->
+<section id="web-portfolio" class="live-portfolio-section">
+  <div class="wrap">
+    <div class="sec-head fade-in">
+      <span class="sec-label">▸ Sitios Web Desarrollados</span>
+      <h2 class="sec-title">Portafolio Web Interactivo</h2>
+      <p class="sec-sub">Explora nuestros sitios directamente desde aquí. Haz clic en cualquier proyecto para abrir una vista previa interactiva y, si quieres, entrar al sitio completo.</p>
+    </div>
+
+    <div class="live-pf-grid" id="live-pf-grid"></div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
@@ -936,6 +1119,32 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </footer>
 
+
+<!-- MODAL DE VISTA PREVIA DE SITIOS WEB -->
+<div id="live-pf-modal" class="modal live-pf-modal" onclick="handleLivePfModalClick(event)">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeLivePortfolioModal()" aria-label="Cerrar vista previa">×</button>
+    <div class="live-pf-modal-head">
+      <div>
+        <div class="live-pf-modal-title" id="live-pf-modal-title">Vista previa del sitio</div>
+        <div class="live-pf-modal-url" id="live-pf-modal-url"></div>
+      </div>
+    </div>
+    <div class="live-pf-iframe-wrap">
+      <iframe id="live-pf-iframe" class="live-pf-iframe" title="Vista previa del sitio web" loading="lazy"></iframe>
+      <div class="live-pf-fallback" id="live-pf-fallback">
+        <div class="live-pf-fallback-icon">🌐</div>
+        <h3>Vista previa no disponible dentro del marco</h3>
+        <p>Este sitio puede bloquear las vistas embebidas por seguridad. Puedes abrirlo directamente en una nueva pestaña.</p>
+        <a id="live-pf-fallback-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Abrir sitio completo ↗</a>
+      </div>
+    </div>
+    <div class="m-cta-row" style="justify-content:flex-end">
+      <a id="live-pf-open-btn" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">🚀 Visitar sitio completo</a>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL INFORMATIVO -->
 <div id="modal" class="modal" onclick="handleModalClick(event)">
   <div class="modal-inner">
@@ -944,14 +1153,14 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </div>
 
-<!-- MODAL DE PAGO PAYPAL -->
+<!-- MODAL DE PAGO STRIPE -->
 <div id="payment-modal" class="modal" onclick="handlePayModalClick(event)">
   <div class="modal-inner" style="max-width:550px;">
     <button class="modal-close" onclick="closePaymentModal()" aria-label="Cerrar">×</button>
     <h2>💳 Portal de Pagos</h2>
-    <p class="m-sub">Procesamiento seguro directo con PayPal</p>
+    <p class="m-sub">Procesamiento seguro con cifrado de grado bancario (Stripe)</p>
 
-    <form id="payment-form" onsubmit="event.preventDefault();">
+    <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
       <div class="pay-form-group">
         <label for="pay-name">Nombre completo</label>
         <input type="text" id="pay-name" required placeholder="Ej. Marcos Torres">
@@ -980,10 +1189,14 @@ footer p{color:var(--sub);font-size:.85rem}
       </div>
 
       <div class="pay-form-group">
-        <label>Método de Pago Seguro</label>
-        <!-- Contenedor del Botón Inteligente de PayPal -->
-        <div id="paypal-button-container"></div>
+        <label>Información de Tarjeta</label>
+        <div id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
       </div>
+
+      <button type="submit" id="pay-submit-btn" class="btn-pay" style="width:100%;justify-content:center;margin-top:10px;">
+        🔒 Procesar Pago Seguro
+      </button>
     </form>
   </div>
 </div>
@@ -1013,58 +1226,43 @@ footer p{color:var(--sub);font-size:.85rem}
 </div>
 
 <script>
-// ─── CONFIGURACIÓN DE PAYPAL ───
-let paypalButtonsRendered = false;
+// ─── CONFIGURACIÓN DE STRIPE ───
+// Clave pública de prueba asignada
+const STRIPE_PUBLIC_KEY = "pk_test_TYooA4J0D25a38QM92qBf41n"; 
+let stripe, cardElement;
 
-function renderPayPalButtons() {
-  if (paypalButtonsRendered) return;
-
-  paypal.Buttons({
+if (typeof Stripe !== 'undefined') {
+  stripe = Stripe(STRIPE_PUBLIC_KEY);
+  const elements = stripe.elements();
+  
+  cardElement = elements.create('card', {
     style: {
-      layout: 'vertical',
-      color:  'gold',
-      shape:  'rect',
-      label:  'paypal'
-    },
-    createOrder: function(data, actions) {
-      const name = document.getElementById('pay-name').value;
-      const email = document.getElementById('pay-email').value;
-      const service = document.getElementById('pay-service').value;
-      const amountVal = document.getElementById('pay-amount').value;
-
-      if (!name || !email || !amountVal || parseFloat(amountVal) <= 0) {
-        alert('Por favor, completa correctamente todos los campos del formulario antes de continuar.');
-        return;
+      base: {
+        color: '#e8f4ff',
+        fontFamily: "'Inter', sans-serif",
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': { color: '#7ba8d4' }
+      },
+      invalid: {
+        color: '#ff5555',
+        iconColor: '#ff5555'
       }
-
-      return actions.order.create({
-        purchase_units: [{
-          description: `Servicio Appline Studio: ${service} - Cliente: ${name}`,
-          amount: {
-            currency_code: 'USD',
-            value: parseFloat(amountVal).toFixed(2)
-          }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      return actions.order.capture().then(function(details) {
-        alert('¡Gracias, ' + details.payer.name.given_name + '! Tu pago fue procesado con éxito.');
-        closePaymentModal();
-      });
-    },
-    onError: function (err) {
-      console.error('Error de PayPal:', err);
-      alert('Ocurrió un error al procesar el pago con PayPal. Intenta de nuevo.');
     }
-  }).render('#paypal-button-container');
-
-  paypalButtonsRendered = true;
+  });
 }
 
 function openPaymentModal(serviceName = '') {
   document.getElementById('payment-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  
+  if (cardElement && !document.getElementById('card-element').hasChildNodes()) {
+    cardElement.mount('#card-element');
+    cardElement.on('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      displayError.textContent = event.error ? event.error.message : '';
+    });
+  }
 
   if (serviceName) {
     const select = document.getElementById('pay-service');
@@ -1075,9 +1273,6 @@ function openPaymentModal(serviceName = '') {
       }
     }
   }
-
-  // Inicializar botones de PayPal al abrir el modal
-  renderPayPalButtons();
 }
 
 function closePaymentModal() {
@@ -1087,6 +1282,64 @@ function closePaymentModal() {
 
 function handlePayModalClick(e) {
   if (e.target === document.getElementById('payment-modal')) closePaymentModal();
+}
+
+async function handlePaymentSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('pay-submit-btn');
+  const errorElement = document.getElementById('card-errors');
+  errorElement.textContent = '';
+  
+  btn.disabled = true;
+  btn.innerText = '⏳ Procesando pago...';
+
+  const name = document.getElementById('pay-name').value;
+  const email = document.getElementById('pay-email').value;
+  const service = document.getElementById('pay-service').value;
+  const amount = document.getElementById('pay-amount').value;
+
+  try {
+    // Llama al endpoint de tu backend que genera el PaymentIntent
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: parseFloat(amount) * 100, currency: 'usd', name, email, service })
+    });
+
+    const data = await response.json();
+
+    if (!data.clientSecret) {
+      throw new Error(data.error || 'No se pudo generar la transacción. Asegúrate de configurar tu backend.');
+    }
+
+    // Confirma el pago mediante Stripe Elements
+    const result = await stripe.confirmCardPayment(data.clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: { name, email }
+      }
+    });
+
+    if (result.error) {
+      errorElement.textContent = result.error.message;
+      btn.disabled = false;
+      btn.innerText = '🔒 Procesar Pago Seguro';
+    } else if (result.paymentIntent.status === 'succeeded') {
+      btn.innerText = '✅ ¡Pago Exitoso!';
+      btn.style.background = '#00ff88';
+      setTimeout(() => {
+        alert('¡Gracias! Tu pago fue procesado con éxito.');
+        closePaymentModal();
+        btn.disabled = false;
+        btn.innerText = '🔒 Procesar Pago Seguro';
+        btn.style.background = 'linear-gradient(135deg,var(--green),#00b359)';
+      }, 1000);
+    }
+  } catch (err) {
+    errorElement.textContent = err.message || 'Error al conectar con el servidor de pago.';
+    btn.disabled = false;
+    btn.innerText = '🔒 Procesar Pago Seguro';
+  }
 }
 
 // ─── CONFIGURACIÓN DEL CHAT ───
@@ -1112,6 +1365,129 @@ function relatedHTML(ids){
   return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
 }
 
+
+// ─── PORTAFOLIO WEB EN VIVO ───
+const livePortfolio = [
+  {
+    name:'Appline Studio',
+    url:'https://applinestudio.com/',
+    icon:'⚡',
+    description:'Sitio principal de Appline Studio — IT, software, hardware y soluciones digitales.'
+  },
+  {
+    name:'Appline Studio · Tienda',
+    url:'https://studioappline-art.github.io/tienda/#',
+    icon:'🛒',
+    description:'Experiencia de tienda online con catálogo y presentación de productos.'
+  },
+  {
+    name:'ProClean Crew',
+    url:'https://studioappline-art.github.io/procleancrew/',
+    icon:'✨',
+    description:'Sitio web profesional para servicios de limpieza y presentación comercial.'
+  },
+  {
+    name:'Zentaurix',
+    url:'https://studioappline-art.github.io/zentaurix/#inicio',
+    icon:'◈',
+    description:'Proyecto web con identidad visual y experiencia de navegación personalizada.'
+  },
+  {
+    name:'Tienda Commerce',
+    url:'https://studioappline-art.github.io/tiendacommeerce/',
+    icon:'🛍️',
+    description:'Concepto de e-commerce orientado a catálogo, productos y conversión.'
+  }
+];
+
+function renderLivePortfolio(){
+  const grid=document.getElementById('live-pf-grid');
+  if(!grid) return;
+  grid.innerHTML=livePortfolio.map((site,i)=>`
+    <article class="live-pf-card fade-in" style="animation-delay:${i*.08}s" onclick="openLivePortfolioModal(${i})" tabindex="0" role="button" aria-label="Ver vista previa de ${site.name}">
+      <div class="live-pf-preview">
+        <div class="live-pf-browser">
+          <div class="live-pf-browserbar">
+            <span class="live-pf-dot"></span><span class="live-pf-dot"></span><span class="live-pf-dot"></span>
+            <span class="live-pf-url">${site.url}</span>
+          </div>
+          <div class="live-pf-browserbody">
+            <div class="site-symbol">${site.icon}</div>
+            <div class="site-loading"></div>
+          </div>
+        </div>
+      </div>
+      <div class="live-pf-info">
+        <div class="live-pf-topline">
+          <h3>${site.name}</h3>
+          <span class="live-pf-status">● Live</span>
+        </div>
+        <p>${site.description}</p>
+        <div class="live-pf-actions">
+          <button class="live-pf-btn" type="button" onclick="event.stopPropagation();openLivePortfolioModal(${i})">👁 Vista previa</button>
+          <a class="live-pf-btn primary" href="${site.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Visitar ↗</a>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+  },{threshold:.12});
+  grid.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+  grid.querySelectorAll('.live-pf-card').forEach((card,index)=>{
+    card.addEventListener('keydown',e=>{
+      if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openLivePortfolioModal(index); }
+    });
+  });
+}
+
+function openLivePortfolioModal(index){
+  const site=livePortfolio[index];
+  if(!site) return;
+  const modal=document.getElementById('live-pf-modal');
+  const iframe=document.getElementById('live-pf-iframe');
+  const fallback=document.getElementById('live-pf-fallback');
+  const openBtn=document.getElementById('live-pf-open-btn');
+  const fallbackLink=document.getElementById('live-pf-fallback-link');
+
+  document.getElementById('live-pf-modal-title').textContent=site.name;
+  document.getElementById('live-pf-modal-url').textContent=site.url;
+  openBtn.href=site.url;
+  fallbackLink.href=site.url;
+  fallback.classList.remove('show');
+
+  iframe.src='about:blank';
+  setTimeout(()=>{
+    iframe.src=site.url;
+    // Algunos sitios bloquean iframes mediante X-Frame-Options/CSP.
+    // El fallback se muestra como opción de apertura directa después de unos segundos.
+    setTimeout(()=>fallback.classList.add('show'),5000);
+  },30);
+
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeLivePortfolioModal(){
+  const modal=document.getElementById('live-pf-modal');
+  const iframe=document.getElementById('live-pf-iframe');
+  modal.classList.remove('open');
+  iframe.src='about:blank';
+  document.getElementById('live-pf-fallback').classList.remove('show');
+  document.body.style.overflow='auto';
+}
+
+function handleLivePfModalClick(e){
+  if(e.target===document.getElementById('live-pf-modal')) closeLivePortfolioModal();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && document.getElementById('live-pf-modal')?.classList.contains('open')){
+    closeLivePortfolioModal();
+  }
+});
+
 // ─── CONTENIDO DE MODALES ───
 const modals = {
   software:`
@@ -1121,7 +1497,7 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">🏗️</span><h4>ERP a Medida</h4><p>Gestión integral de recursos: inventario, RRHH, finanzas y producción en una plataforma unificada.</p></div>
       <div class="m-feat"><span class="mf-icon">👥</span><h4>CRM Inteligente</h4><p>Pipeline de ventas con automatización, scoring de leads y analytics predictivo para maximizar conversiones.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔗</span><h4>Integraciones API</h4><p>Conectamos tu software con PayPal, QuickBooks, SAP, Salesforce y cientos de servicios externos.</p></div>
+      <div class="m-feat"><span class="mf-icon">🔗</span><h4>Integraciones API</h4><p>Conectamos tu software con Stripe, QuickBooks, SAP, Salesforce y cientos de servicios externos.</p></div>
       <div class="m-feat"><span class="mf-icon">📊</span><h4>Dashboards BI</h4><p>Visualizaciones en tiempo real de tus KPIs críticos con alertas automáticas y reportes ejecutivos.</p></div>
     </div>
     <h4 style="color:var(--neon);margin:25px 0 15px;font-family:'Syne',sans-serif">Stack Tecnológico</h4>
@@ -1162,7 +1538,7 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">☁️</span><h4>Multicloud Sync</h4><p>Accede a ventas, inventario y empleados desde cualquier dispositivo en tiempo real.</p></div>
       <div class="m-feat"><span class="mf-icon">📈</span><h4>Reportes Avanzados</h4><p>Dashboard ejecutivo con ventas por hora, productos top, márgenes y proyecciones automáticas.</p></div>
-      <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR y pagos digitales a través de PayPal desde una sola terminal.</p></div>
+      <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR, pagos móviles (Apple Pay, Google Pay) y BNPL desde una sola terminal.</p></div>
       <div class="m-feat"><span class="mf-icon">📦</span><h4>Inventario Inteligente</h4><p>Control de stock con alertas de reabasto, gestión de proveedores y código de barras/QR.</p></div>
     </div>
     <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('POS System')">💳 Comprar / Suscribir POS</button></div>
@@ -1320,6 +1696,9 @@ function addBubble(text, cls){
   box.scrollTop = box.scrollHeight;
   return d;
 }
+
+// ─── INICIALIZAR PORTAFOLIO WEB ───
+renderLivePortfolio();
 
 // ─── ANIMACIONES AL SCROLLEAR ───
 const obs = new IntersectionObserver(entries=>{
