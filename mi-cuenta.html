@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title id="pageTitle">My Account | MyUtahSpot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .lang-switch { background-color: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 9999px; padding: 3px; display: inline-flex; align-items: center; gap: 2px; }
+        .lang-switch button { border-radius: 9999px; padding: 4px 10px; font-size: 11px; font-weight: 700; letter-spacing: .02em; color: #64748B; transition: all .15s ease; cursor: pointer; }
+        .lang-switch button.active { background-color: #0F172A; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+        .lang-switch button:not(.active):hover { color: #2563EB; }
+        .tab-btn { color: #64748B; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #2563EB; border-bottom-color: #2563EB; }
+        .field { width: 100%; border: 1px solid #E2E8F0; border-radius: .5rem; padding: .625rem .75rem; font-size: .875rem; background: #fff; }
+        .field:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+        .btn-primary { background: #2563EB; color: #fff; font-weight: 600; font-size: .875rem; padding: .625rem 1.25rem; border-radius: .5rem; transition: background-color .15s ease; }
+        .btn-primary:hover:not(:disabled) { background: #1D4ED8; }
+        .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2" aria-label="MyUtahSpot">
+                <img src="logo-myutahspot.png" alt="MyUtahSpot.com" class="h-9 w-auto">
+            </a>
+            <div class="flex items-center gap-3 sm:gap-4">
+                <a href="index.html" data-i18n="nav.back" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition">← Back to directory</a>
+                <div class="lang-switch" role="group" aria-label="Language selector / Selector de idioma">
+                    <button type="button" id="langBtnEn" onclick="applyLanguage('en')" class="active">EN</button>
+                    <button type="button" id="langBtnEs" onclick="applyLanguage('es')">ES</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-xl mx-auto px-4 py-8 sm:py-12">
+
+        <div id="serverNotice" class="hidden mb-6 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg p-3" data-i18n="notice.needServer">
+            Accounts work on the live site (myutahspot.applinestudio.com), where the server is available.
+        </div>
+
+        <!-- Cargando -->
+        <div id="viewLoading" class="text-center text-sm text-slate-400 py-16" data-i18n="loading">Loading…</div>
+
+        <!-- ================= VISTA: INICIAR SESIÓN / CREAR CUENTA ================= -->
+        <section id="viewAuth" class="hidden">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="flex border-b border-slate-200" role="tablist">
+                    <button type="button" id="tabLogin" role="tab" class="tab-btn active flex-1 py-3.5 text-sm font-semibold transition" onclick="setMode('login')" data-i18n="auth.tabLogin">Sign in</button>
+                    <button type="button" id="tabRegister" role="tab" class="tab-btn flex-1 py-3.5 text-sm font-semibold transition" onclick="setMode('register')" data-i18n="auth.tabRegister">Create account</button>
+                </div>
+                <form id="authForm" class="p-6 space-y-4" novalidate>
+                    <div>
+                        <h1 id="authTitle" class="text-xl font-bold"></h1>
+                        <p id="authSubtitle" class="text-sm text-slate-500 mt-1"></p>
+                    </div>
+                    <div>
+                        <label for="authEmail" data-i18n="auth.email" class="block text-xs font-bold text-slate-700 uppercase mb-1">Email</label>
+                        <input type="email" id="authEmail" class="field" autocomplete="email" inputmode="email" data-i18n-placeholder="auth.emailPh" placeholder="you@gmail.com" required>
+                    </div>
+                    <div>
+                        <label for="authPassword" data-i18n="auth.password" class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" id="authPassword" class="field pr-16" autocomplete="current-password" required>
+                            <button type="button" id="togglePw" onclick="togglePassword()" class="absolute inset-y-0 right-0 px-3 text-xs font-semibold text-slate-500 hover:text-blue-600" data-i18n="auth.show">Show</button>
+                        </div>
+                        <p id="pwHint" class="hidden mt-1 text-[11px] text-slate-500"></p>
+                    </div>
+                    <label id="termsRow" class="hidden flex items-start gap-2 text-[12px] text-slate-600 leading-relaxed">
+                        <input type="checkbox" id="authTerms" class="mt-0.5">
+                        <span data-i18n-html="auth.terms">I agree to the <a href="terminos.html" target="_blank" class="font-semibold text-blue-600 underline">Terms &amp; Conditions</a> and the <a href="privacidad.html" target="_blank" class="font-semibold text-blue-600 underline">Privacy Notice</a>.</span>
+                    </label>
+                    <p id="authError" class="hidden text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2" role="alert"></p>
+                    <button type="submit" id="authSubmit" class="btn-primary w-full"></button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= VISTA: PANEL DE PERFIL ================= -->
+        <section id="viewAccount" class="hidden space-y-6">
+            <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                    <h1 data-i18n="acct.title" class="text-2xl font-bold">My account</h1>
+                    <p id="acctEmail" class="text-sm text-slate-500 truncate"></p>
+                </div>
+                <button type="button" onclick="logout()" data-i18n="acct.logout" class="shrink-0 text-sm font-semibold text-slate-600 hover:text-red-600 border border-slate-200 bg-white rounded-lg px-3 py-2 transition">Log out</button>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+                <h2 data-i18n="acct.phoneTitle" class="font-bold text-lg">Phone / WhatsApp</h2>
+                <p data-i18n="acct.phoneHelp" class="text-sm text-slate-500 mt-1">The number customers use to contact you.</p>
+                <form id="phoneForm" class="mt-4 flex flex-col sm:flex-row gap-3" novalidate>
+                    <input type="tel" id="phoneInput" class="field flex-1" autocomplete="tel" inputmode="tel" placeholder="(801) 555-0123">
+                    <button type="submit" id="phoneSave" class="btn-primary" data-i18n="acct.save">Save</button>
+                </form>
+                <p id="phoneMsg" class="hidden mt-2 text-sm" role="status"></p>
+            </div>
+
+            <!-- Fotos -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 data-i18n="acct.photosTitle" class="font-bold text-lg">Business photos</h2>
+                    <span id="photoCount" class="text-xs font-bold text-slate-600 bg-slate-100 rounded-full px-2.5 py-1"></span>
+                </div>
+                <p id="photoHelp" class="text-sm text-slate-500 mt-1"></p>
+                <div id="photoGrid" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+                <p id="photoMsg" class="hidden mt-3 text-sm" role="status"></p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-6 text-center text-xs text-slate-500">
+        <a href="terminos.html" data-i18n="footer.terms" class="hover:text-blue-600 underline">Terms &amp; Conditions</a>
+        <span class="mx-2">·</span>
+        <a href="privacidad.html" data-i18n="footer.privacy" class="hover:text-blue-600 underline">Privacy Notice</a>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        const API_URL = window.MYUTAHSPOT_API_URL || (location.hostname === 'localhost' ? location.origin : '');
+        const MIN_PASSWORD = 8;
+        const MAX_SIDE = 1280;          // la foto se reduce a 1280 px por su lado mayor…
+        const IMG_QUALITY = 0.7;        // …y se comprime a calidad media-baja
+
+        // ------------------------------------------------------------------ Textos EN / ES
+        const I18N = {
+            en: {
+                'page.title': 'My Account | MyUtahSpot',
+                'nav.back': '← Back to directory',
+                'notice.needServer': 'Accounts work on the live site (myutahspot.applinestudio.com), where the server is available.',
+                'loading': 'Loading…',
+                'auth.tabLogin': 'Sign in', 'auth.tabRegister': 'Create account',
+                'auth.titleLogin': 'Welcome back', 'auth.subtitleLogin': 'Sign in to manage your phone number and photos.',
+                'auth.titleRegister': 'Create your free account', 'auth.subtitleRegister': 'Just your email and a password. It takes less than a minute.',
+                'auth.email': 'Email', 'auth.emailPh': 'you@gmail.com', 'auth.password': 'Password',
+                'auth.show': 'Show', 'auth.hide': 'Hide',
+                'auth.pwHint': 'At least 8 characters.',
+                'auth.submitLogin': 'Sign in', 'auth.submitRegister': 'Create account', 'auth.working': 'Please wait…',
+                'auth.terms': 'I agree to the <a href="terminos.html" target="_blank" class="font-semibold text-blue-600 underline">Terms &amp; Conditions</a> and the <a href="privacidad.html" target="_blank" class="font-semibold text-blue-600 underline">Privacy Notice</a>.',
+                'acct.title': 'My account', 'acct.logout': 'Log out',
+                'acct.phoneTitle': 'Phone / WhatsApp', 'acct.phoneHelp': 'The number customers use to contact you.',
+                'acct.save': 'Save', 'acct.saved': 'Saved ✓',
+                'acct.photosTitle': 'Business photos',
+                'acct.photosHelp': 'Up to {max} photos. They are automatically resized to save space.',
+                'acct.addPhoto': 'Add photo', 'acct.uploading': 'Uploading…',
+                'acct.deletePhoto': 'Delete photo', 'acct.confirmDelete': 'Delete this photo?',
+                'acct.photoLimitNote': 'Only the first {n} photo(s) were added — the limit is {max}.',
+                'footer.terms': 'Terms & Conditions', 'footer.privacy': 'Privacy Notice',
+                'err.email_invalid': 'Please enter a valid email address.',
+                'err.password_short': 'The password must have at least 8 characters.',
+                'err.password_long': 'The password is too long (72 characters maximum).',
+                'err.terms_required': 'You must accept the Terms & Conditions and the Privacy Notice.',
+                'err.email_taken': 'That email is already registered. Try signing in instead.',
+                'err.bad_credentials': 'Incorrect email or password.',
+                'err.too_many': 'Too many attempts. Please wait a few minutes and try again.',
+                'err.not_logged_in': 'Your session expired. Please sign in again.',
+                'err.phone_invalid': 'Enter a valid 10-digit phone number.',
+                'err.photo_limit': 'You already have the maximum number of photos. Delete one to add another.',
+                'err.photo_invalid': 'That file is not a supported image (use JPG, PNG or WebP).',
+                'err.photo_too_big': 'That photo is too large. Try a smaller one.',
+                'err.upload_failed': 'The upload failed. Please try again.',
+                'err.network': 'Could not reach the server. Check your connection and try again.',
+                'err.server_error': 'Something went wrong. Please try again in a moment.'
+            },
+            es: {
+                'page.title': 'Mi cuenta | MyUtahSpot',
+                'nav.back': '← Volver al directorio',
+                'notice.needServer': 'Las cuentas funcionan en el sitio en línea (myutahspot.applinestudio.com), donde el servidor está disponible.',
+                'loading': 'Cargando…',
+                'auth.tabLogin': 'Iniciar sesión', 'auth.tabRegister': 'Crear cuenta',
+                'auth.titleLogin': 'Bienvenido de nuevo', 'auth.subtitleLogin': 'Inicia sesión para administrar tu teléfono y tus fotos.',
+                'auth.titleRegister': 'Crea tu cuenta gratis', 'auth.subtitleRegister': 'Solo tu correo y una contraseña. Toma menos de un minuto.',
+                'auth.email': 'Correo electrónico', 'auth.emailPh': 'tu@gmail.com', 'auth.password': 'Contraseña',
+                'auth.show': 'Mostrar', 'auth.hide': 'Ocultar',
+                'auth.pwHint': 'Mínimo 8 caracteres.',
+                'auth.submitLogin': 'Iniciar sesión', 'auth.submitRegister': 'Crear cuenta', 'auth.working': 'Espera un momento…',
+                'auth.terms': 'Acepto los <a href="terminos.html" target="_blank" class="font-semibold text-blue-600 underline">Términos y condiciones</a> y el <a href="privacidad.html" target="_blank" class="font-semibold text-blue-600 underline">Aviso de privacidad</a>.',
+                'acct.title': 'Mi cuenta', 'acct.logout': 'Cerrar sesión',
+                'acct.phoneTitle': 'Teléfono / WhatsApp', 'acct.phoneHelp': 'El número con el que tus clientes te contactan.',
+                'acct.save': 'Guardar', 'acct.saved': 'Guardado ✓',
+                'acct.photosTitle': 'Fotos de tu negocio',
+                'acct.photosHelp': 'Hasta {max} fotos. Se reducen automáticamente para ahorrar espacio.',
+                'acct.addPhoto': 'Agregar foto', 'acct.uploading': 'Subiendo…',
+                'acct.deletePhoto': 'Eliminar foto', 'acct.confirmDelete': '¿Eliminar esta foto?',
+                'acct.photoLimitNote': 'Solo se agregaron las primeras {n} foto(s): el límite es {max}.',
+                'footer.terms': 'Términos y condiciones', 'footer.privacy': 'Aviso de privacidad',
+                'err.email_invalid': 'Escribe un correo electrónico válido.',
+                'err.password_short': 'La contraseña debe tener al menos 8 caracteres.',
+                'err.password_long': 'La contraseña es demasiado larga (máximo 72 caracteres).',
+                'err.terms_required': 'Debes aceptar los Términos y condiciones y el Aviso de privacidad.',
+                'err.email_taken': 'Ese correo ya está registrado. Prueba iniciar sesión.',
+                'err.bad_credentials': 'Correo o contraseña incorrectos.',
+                'err.too_many': 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.',
+                'err.not_logged_in': 'Tu sesión expiró. Inicia sesión de nuevo.',
+                'err.phone_invalid': 'Escribe un teléfono válido de 10 dígitos.',
+                'err.photo_limit': 'Ya tienes el máximo de fotos. Elimina una para agregar otra.',
+                'err.photo_invalid': 'Ese archivo no es una imagen compatible (usa JPG, PNG o WebP).',
+                'err.photo_too_big': 'Esa foto es demasiado grande. Prueba con una más pequeña.',
+                'err.upload_failed': 'No se pudo subir. Inténtalo de nuevo.',
+                'err.network': 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
+                'err.server_error': 'Algo salió mal. Inténtalo de nuevo en un momento.'
+            }
+        };
+
+        let currentLang = (function () { try { return localStorage.getItem('myutahspot_lang') || 'en'; } catch (e) { return 'en'; } })();
+        let mode = 'login';
+        let account = null;   // { email, phone, photos: [{id,url}] }
+        let maxPhotos = 5;
+        let busy = false;
+
+        function t(key, vars) {
+            let text = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+            if (vars) Object.keys(vars).forEach(k => { text = text.replace('{' + k + '}', vars[k]); });
+            return text;
+        }
+        const $ = id => document.getElementById(id);
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            try { localStorage.setItem('myutahspot_lang', lang); } catch (e) {}
+            document.documentElement.lang = lang;
+            document.title = t('page.title');
+            $('langBtnEn').classList.toggle('active', lang === 'en');
+            $('langBtnEs').classList.toggle('active', lang === 'es');
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+            renderAuthTexts();
+            $('togglePw').textContent = $('authPassword').type === 'password' ? t('auth.show') : t('auth.hide');
+            if (account) renderAccount();
+            // Un error visible se limpia para no quedar en el idioma anterior.
+            $('authError').classList.add('hidden');
+        }
+
+        // ------------------------------------------------------------------ Llamadas al servidor
+        async function api(path, options) {
+            options = options || {};
+            let response;
+            try {
+                response = await fetch(`${API_URL}/api/${path}`, {
+                    credentials: 'same-origin',
+                    ...options,
+                    headers: { 'X-Requested-With': 'fetch', ...(options.headers || {}) }
+                });
+            } catch (e) {
+                const err = new Error('network'); err.code = 'network'; throw err;
+            }
+            let data = {};
+            try { data = await response.json(); } catch (e) {}
+            if (!response.ok) {
+                const err = new Error(data.error || 'server_error');
+                err.code = data.error || 'server_error';
+                throw err;
+            }
+            return data;
+        }
+        function postJson(path, body) {
+            return api(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        }
+        function errText(err) { return t('err.' + (err && err.code ? err.code : 'server_error')); }
+
+        // ------------------------------------------------------------------ Vistas
+        function show(view) {
+            ['viewLoading', 'viewAuth', 'viewAccount'].forEach(id => $(id).classList.toggle('hidden', id !== view));
+        }
+
+        function setMode(next) {
+            mode = next;
+            $('tabLogin').classList.toggle('active', mode === 'login');
+            $('tabRegister').classList.toggle('active', mode === 'register');
+            $('termsRow').classList.toggle('hidden', mode !== 'register');
+            $('pwHint').classList.toggle('hidden', mode !== 'register');
+            $('authPassword').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+            $('authError').classList.add('hidden');
+            renderAuthTexts();
+        }
+        function renderAuthTexts() {
+            const reg = mode === 'register';
+            $('authTitle').textContent = t(reg ? 'auth.titleRegister' : 'auth.titleLogin');
+            $('authSubtitle').textContent = t(reg ? 'auth.subtitleRegister' : 'auth.subtitleLogin');
+            $('pwHint').textContent = t('auth.pwHint');
+            $('authSubmit').textContent = busy ? t('auth.working') : t(reg ? 'auth.submitRegister' : 'auth.submitLogin');
+        }
+        function togglePassword() {
+            const input = $('authPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            $('togglePw').textContent = input.type === 'password' ? t('auth.show') : t('auth.hide');
+        }
+        function showAuthError(message) {
+            const box = $('authError');
+            box.textContent = message;
+            box.classList.remove('hidden');
+        }
+
+        // ------------------------------------------------------------------ Registro / Login
+        async function handleAuth(e) {
+            e.preventDefault();
+            if (busy) return;
+            const email = $('authEmail').value.trim();
+            const password = $('authPassword').value;
+            $('authError').classList.add('hidden');
+
+            // Validación inmediata en la página (el servidor la repite por seguridad).
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAuthError(t('err.email_invalid'));
+            if (mode === 'register') {
+                if (password.length < MIN_PASSWORD) return showAuthError(t('err.password_short'));
+                if (!$('authTerms').checked) return showAuthError(t('err.terms_required'));
+            } else if (!password) {
+                return showAuthError(t('err.bad_credentials'));
+            }
+
+            busy = true; $('authSubmit').disabled = true; renderAuthTexts();
+            try {
+                const data = await postJson('auth.php', {
+                    action: mode,
+                    email,
+                    password,
+                    termsAccepted: mode === 'register' ? $('authTerms').checked : undefined
+                });
+                $('authForm').reset();
+                enterAccount(data);
+            } catch (err) {
+                showAuthError(errText(err));
+            } finally {
+                busy = false; $('authSubmit').disabled = false; renderAuthTexts();
+            }
+        }
+
+        async function logout() {
+            try { await postJson('auth.php', { action: 'logout' }); } catch (e) {}
+            account = null;
+            setMode('login');
+            show('viewAuth');
+            window.scrollTo(0, 0);
+        }
+
+        // ------------------------------------------------------------------ Panel de perfil
+        function enterAccount(data) {
+            account = data.user;
+            maxPhotos = data.maxPhotos || 5;
+            renderAccount();
+            show('viewAccount');
+            window.scrollTo(0, 0);
+        }
+
+        function renderAccount() {
+            $('acctEmail').textContent = account.email;
+            if (document.activeElement !== $('phoneInput')) $('phoneInput').value = account.phone || '';
+            renderPhotos();
+        }
+
+        function flash(el, message, ok) {
+            el.textContent = message;
+            el.className = 'mt-2 text-sm ' + (ok ? 'text-green-600' : 'text-red-600');
+            if (ok) setTimeout(() => el.classList.add('hidden'), 2500);
+        }
+
+        async function savePhone(e) {
+            e.preventDefault();
+            const msg = $('phoneMsg');
+            $('phoneSave').disabled = true;
+            try {
+                const data = await postJson('account.php', { action: 'update_phone', phone: $('phoneInput').value });
+                account = data.user;
+                $('phoneInput').value = account.phone || '';
+                flash(msg, t('acct.saved'), true);
+            } catch (err) {
+                flash(msg, errText(err), false);
+                if (err.code === 'not_logged_in') logoutLocal();
+            } finally {
+                $('phoneSave').disabled = false;
+            }
+        }
+        function logoutLocal() { account = null; setMode('login'); show('viewAuth'); }
+
+        function renderPhotos() {
+            const grid = $('photoGrid');
+            grid.innerHTML = '';
+            const photos = account.photos || [];
+            $('photoCount').textContent = `${photos.length}/${maxPhotos}`;
+            $('photoHelp').textContent = t('acct.photosHelp', { max: maxPhotos });
+
+            photos.forEach(photo => {
+                const cell = document.createElement('div');
+                cell.className = 'relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100';
+                const img = document.createElement('img');
+                img.src = `${API_URL}/${photo.url}`;
+                img.alt = '';
+                img.loading = 'lazy';
+                img.className = 'w-full h-full object-cover';
+                const del = document.createElement('button');
+                del.type = 'button';
+                del.setAttribute('aria-label', t('acct.deletePhoto'));
+                del.title = t('acct.deletePhoto');
+                del.className = 'absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-red-600 text-white text-base leading-none flex items-center justify-center transition';
+                del.textContent = '×';
+                del.onclick = () => deletePhoto(photo.id);
+                cell.append(img, del);
+                grid.appendChild(cell);
+            });
+
+            if (photos.length < maxPhotos) {
+                const add = document.createElement('button');
+                add.type = 'button';
+                add.className = 'aspect-square rounded-xl border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-slate-500 hover:text-blue-600 flex flex-col items-center justify-center gap-1 text-xs font-semibold transition';
+                add.innerHTML = '<span class="text-2xl leading-none">+</span>';
+                const label = document.createElement('span');
+                label.textContent = t('acct.addPhoto');
+                add.appendChild(label);
+                add.onclick = () => $('photoInput').click();
+                grid.appendChild(add);
+            }
+        }
+
+        // Reduce la foto en el navegador antes de subirla (ahorra datos y espacio en el servidor).
+        async function shrinkImage(file) {
+            let bitmap;
+            try { bitmap = await createImageBitmap(file); }
+            catch (e) { const err = new Error('photo_invalid'); err.code = 'photo_invalid'; throw err; }
+            const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+            canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+            if (bitmap.close) bitmap.close();
+            const toBlob = (type, q) => new Promise(resolve => canvas.toBlob(resolve, type, q));
+            let blob = await toBlob('image/webp', IMG_QUALITY);
+            if (!blob || blob.type !== 'image/webp') blob = await toBlob('image/jpeg', IMG_QUALITY + 0.02); // Safari
+            return blob;
+        }
+
+        async function handlePhotoFiles(fileList) {
+            const msg = $('photoMsg');
+            msg.classList.add('hidden');
+            const slots = maxPhotos - account.photos.length;
+            const files = Array.from(fileList).slice(0, Math.max(slots, 0));
+            const skipped = fileList.length - files.length;
+            if (!files.length) return flash(msg, t('err.photo_limit'), false);
+
+            msg.className = 'mt-3 text-sm text-slate-500';
+            msg.textContent = t('acct.uploading');
+            try {
+                for (const file of files) {
+                    const blob = await shrinkImage(file);
+                    const form = new FormData();
+                    form.append('action', 'upload_photo');
+                    form.append('photo', blob, blob.type === 'image/webp' ? 'photo.webp' : 'photo.jpg');
+                    const data = await api('account.php', { method: 'POST', body: form });
+                    account = data.user;
+                    renderPhotos();
+                }
+                if (skipped > 0) flash(msg, t('acct.photoLimitNote', { n: files.length, max: maxPhotos }), false);
+                else msg.classList.add('hidden');
+            } catch (err) {
+                flash(msg, errText(err), false);
+                if (err.code === 'not_logged_in') logoutLocal();
+            }
+        }
+
+        async function deletePhoto(id) {
+            if (!confirm(t('acct.confirmDelete'))) return;
+            const msg = $('photoMsg');
+            try {
+                const data = await postJson('account.php', { action: 'delete_photo', id });
+                account = data.user;
+                renderPhotos();
+                msg.classList.add('hidden');
+            } catch (err) {
+                flash(msg, errText(err), false);
+                if (err.code === 'not_logged_in') logoutLocal();
+            }
+        }
+
+        // ------------------------------------------------------------------ Inicio
+        document.addEventListener('DOMContentLoaded', async () => {
+            $('authForm').addEventListener('submit', handleAuth);
+            $('phoneForm').addEventListener('submit', savePhone);
+            $('photoInput').addEventListener('change', e => {
+                const files = e.target.files;
+                if (files && files.length) handlePhotoFiles(files).finally(() => { e.target.value = ''; });
+            });
+            applyLanguage(currentLang);
+            setMode('login');
+
+            if (!API_URL) {
+                $('serverNotice').classList.remove('hidden');
+                show('viewAuth');
+                return;
+            }
+            try {
+                const data = await api('auth.php');
+                if (data.user) { enterAccount(data); }
+                else { show('viewAuth'); }
+            } catch (err) {
+                show('viewAuth');
+                showAuthError(errText(err));
+            }
+        });
+    </script>
+</body>
+</html>
