@@ -7,6 +7,10 @@
 <meta name="description" content="Appline Studio: desarrollo de software a medida, hardware empresarial, redes, ciberseguridad y soporte técnico en Utah, USA.">
 <meta name="theme-color" content="#050c1f">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- STRIPE SDK -->
+<script src="https://js.stripe.com/v3/"></script>
+
 <style>
 :root {
   --neon: #4fc3ff;
@@ -70,6 +74,14 @@ nav{
   text-decoration:none;letter-spacing:.5px;transition:.3s;
 }
 .nav-cta:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(79,195,255,.4)}
+.nav-pay-btn{
+  background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);
+  color:var(--green);font-weight:700;font-size:.85rem;
+  padding:10px 20px;border-radius:50px;cursor:pointer;transition:.3s;
+  display:flex;align-items:center;gap:6px;margin-left:10px;
+}
+.nav-pay-btn:hover{background:rgba(0,255,136,.2);transform:translateY(-1px)}
+
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:5px}
 .hamburger span{display:block;width:24px;height:2px;background:var(--neon);transition:.3s}
 .mobile-menu{
@@ -152,6 +164,14 @@ nav{
   text-decoration:none;display:inline-block;
 }
 .btn-outline:hover{border-color:var(--neon);color:var(--neon);transform:translateY(-3px)}
+.btn-pay{
+  background:linear-gradient(135deg,var(--green),#00b359);
+  color:#000;font-weight:700;padding:15px 35px;
+  border-radius:50px;border:none;cursor:pointer;font-size:1rem;
+  transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-pay:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(0,255,136,.3)}
+
 .hero-stats{
   display:flex;gap:50px;justify-content:center;flex-wrap:wrap;
   margin-top:70px;padding-top:50px;
@@ -344,7 +364,7 @@ section{padding:100px 0}
 .feat-item h4{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
 .feat-item p{font-size:.83rem;color:var(--sub)}
 
-/* ─── MODAL ─── */
+/* ─── MODAL & CHECKOUT MODAL ─── */
 .modal{
   position:fixed;inset:0;z-index:6000;
   background:rgba(5,12,31,.95);
@@ -370,6 +390,48 @@ section{padding:100px 0}
   display:flex;align-items:center;justify-content:center;transition:.3s;
 }
 .modal-close:hover{background:rgba(79,195,255,.15);transform:rotate(90deg)}
+
+/* ESTILOS FORMULARIO DE PAGO */
+.pay-form-group {
+  margin-bottom: 20px;
+}
+.pay-form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pay-form-group input, .pay-form-group select {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: .3s;
+}
+.pay-form-group input:focus, .pay-form-group select:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 10px rgba(79,195,255,0.2);
+}
+#card-element {
+  background: rgba(255,255,255,0.05);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+#card-errors {
+  color: #ff5555;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
 #modal-body h2{
   font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.2rem);
   font-weight:800;color:var(--neon);margin-bottom:12px;
@@ -484,6 +546,357 @@ section{padding:100px 0}
 }
 .fab-sms:hover{transform:scale(1.08)}
 
+
+/* ─── LIVE WEBSITE PORTFOLIO ─── */
+.live-portfolio-section{
+  position:relative;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%,rgba(0,114,255,.08),transparent),
+    linear-gradient(180deg,rgba(5,12,31,.2),rgba(8,18,43,.55));
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.live-pf-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;
+}
+.live-pf-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:26px;
+  background:linear-gradient(145deg,rgba(10,31,68,.92),rgba(5,12,31,.96));
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:.45s cubic-bezier(.165,.84,.44,1);
+  box-shadow:0 18px 45px rgba(0,0,0,.22);
+}
+.live-pf-card:hover{
+  transform:translateY(-10px);
+  border-color:rgba(79,195,255,.5);
+  box-shadow:0 30px 65px rgba(0,0,0,.45),0 0 35px rgba(79,195,255,.09);
+}
+.live-pf-preview{
+  height:205px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(79,195,255,.16),transparent 30%),
+    linear-gradient(135deg,#071735,#0b2250);
+}
+.live-pf-preview::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(5,12,31,.9));
+  pointer-events:none;
+}
+.live-pf-browser{
+  position:absolute;
+  left:18px;right:18px;top:18px;
+  height:170px;
+  border-radius:15px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background:#06112a;
+  box-shadow:0 18px 35px rgba(0,0,0,.4);
+  transform:translateY(8px);
+  transition:.5s;
+}
+.live-pf-card:hover .live-pf-browser{transform:translateY(2px) scale(1.015)}
+.live-pf-browserbar{
+  height:25px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:0 9px;
+  background:rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.live-pf-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35)}
+.live-pf-url{
+  margin-left:4px;
+  flex:1;
+  min-width:0;
+  color:rgba(232,244,255,.55);
+  font-size:8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.live-pf-browserbody{
+  height:145px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:9px;
+  background:
+    linear-gradient(135deg,rgba(0,114,255,.12),rgba(0,242,254,.04)),
+    #071532;
+}
+.live-pf-browserbody .site-symbol{font-size:2.5rem;filter:drop-shadow(0 0 14px rgba(79,195,255,.3))}
+.live-pf-browserbody .site-loading{
+  width:90px;height:6px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden;
+}
+.live-pf-browserbody .site-loading::after{
+  content:'';display:block;width:55%;height:100%;
+  background:linear-gradient(90deg,var(--deep),var(--neon));
+  animation:liveLoad 1.8s ease-in-out infinite;
+}
+.live-pf-info{padding:23px}
+.live-pf-topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.live-pf-info h3{
+  font-family:'Syne',sans-serif;font-size:1.18rem;color:#fff;font-weight:700;
+}
+.live-pf-status{
+  font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+  color:var(--green);border:1px solid rgba(0,255,136,.2);
+  background:rgba(0,255,136,.07);padding:4px 9px;border-radius:50px;
+  white-space:nowrap;
+}
+.live-pf-info p{font-size:.84rem;color:var(--sub);margin-bottom:17px;min-height:42px}
+.live-pf-actions{display:flex;gap:9px;flex-wrap:wrap}
+.live-pf-btn{
+  border:1px solid var(--border);background:rgba(79,195,255,.06);
+  color:var(--text);border-radius:50px;padding:9px 14px;
+  font-size:.78rem;font-weight:600;cursor:pointer;transition:.3s;
+}
+.live-pf-btn.primary{
+  border:0;background:linear-gradient(135deg,var(--neon),var(--deep));color:#001020;
+}
+.live-pf-btn:hover{transform:translateY(-2px);border-color:var(--neon);color:var(--neon)}
+.live-pf-btn.primary:hover{color:#001020;box-shadow:0 8px 20px rgba(0,114,255,.3)}
+.live-pf-modal .modal-inner{
+  max-width:1250px;
+  padding:22px;
+  background:#040b1d;
+}
+.live-pf-modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:15px;padding:3px 52px 16px 5px;
+}
+.live-pf-modal-title{
+  font-family:'Syne',sans-serif;font-size:1.2rem;color:#fff;
+}
+.live-pf-modal-url{font-size:.75rem;color:var(--sub);margin-top:3px;word-break:break-all}
+.live-pf-iframe-wrap{
+  position:relative;width:100%;height:min(72vh,760px);
+  min-height:480px;border-radius:18px;overflow:hidden;
+  border:1px solid var(--border);background:#06112a;
+}
+.live-pf-iframe{
+  width:100%;height:100%;border:0;background:#fff;
+}
+.live-pf-fallback{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:30px;
+  background:linear-gradient(135deg,#06112a,#081d43);
+}
+.live-pf-fallback.show{display:flex}
+.live-pf-fallback-icon{font-size:3rem;margin-bottom:14px}
+.live-pf-fallback h3{font-family:'Syne',sans-serif;color:#fff;margin-bottom:8px}
+.live-pf-fallback p{color:var(--sub);max-width:520px;margin-bottom:20px}
+@keyframes liveLoad{0%,100%{transform:translateX(-85%)}50%{transform:translateX(85%)}}
+@media(max-width:700px){
+  .live-pf-grid{grid-template-columns:1fr}
+  .live-pf-iframe-wrap{height:65vh;min-height:400px}
+  .live-pf-modal .modal-inner{padding:14px}
+  .live-pf-modal-head{padding-right:48px}
+}
+
+/* ─── PORTAFOLIO WEB: MEJORAS (stats, toolbar, tarjetas, modal, scroll-top) ─── */
+.pf-stats{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.pf-stat{
+  flex:1 1 170px;display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-radius:20px;
+  background:linear-gradient(145deg,rgba(10,31,68,.7),rgba(5,12,31,.85));
+  border:1px solid var(--border);backdrop-filter:blur(8px);
+}
+.pf-stat-ico{
+  width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  font-size:1.15rem;background:rgba(79,195,255,.1);border:1px solid var(--border);
+}
+.pf-stat b{display:block;font-family:'Syne',sans-serif;font-size:1.6rem;color:#fff;line-height:1}
+.pf-stat small{color:var(--sub);font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase}
+
+.pf-toolbar{
+  margin-bottom:30px;padding:20px;border-radius:26px;
+  background:linear-gradient(145deg,rgba(10,31,68,.55),rgba(5,12,31,.7));
+  border:1px solid var(--border);backdrop-filter:blur(10px);
+}
+.pf-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.pf-search{flex:1 1 280px;position:relative;display:flex;align-items:center}
+.pf-search .pf-s-ico{position:absolute;left:18px;pointer-events:none;color:var(--sub);font-size:.95rem}
+.pf-search input{
+  width:100%;padding:14px 46px 14px 46px;border-radius:50px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:#fff;font:inherit;font-size:.92rem;outline:none;transition:.3s;
+}
+.pf-search input::placeholder{color:var(--sub)}
+.pf-search input:focus{border-color:var(--neon);box-shadow:0 0 0 4px rgba(79,195,255,.1)}
+.pf-search button{
+  position:absolute;right:10px;width:28px;height:28px;border-radius:50%;
+  border:0;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:none;
+  font-size:1rem;line-height:1;
+}
+.pf-search.has-text button{display:block}
+.pf-select{
+  padding:13px 38px 13px 18px;border-radius:50px;border:1px solid var(--border);
+  background:rgba(255,255,255,.05);color:#fff;font:inherit;font-size:.88rem;outline:none;cursor:pointer;
+  transition:.3s;
+}
+.pf-select:focus,.pf-select:hover{border-color:var(--neon)}
+.pf-select option{background:#08122b;color:#fff}
+.pf-view{display:flex;border:1px solid var(--border);border-radius:50px;padding:4px;background:rgba(255,255,255,.04)}
+.pf-view button{
+  width:44px;height:38px;border:0;border-radius:50px;background:transparent;
+  color:var(--sub);cursor:pointer;transition:.3s;font-size:1.05rem;
+}
+.pf-view button.active{background:linear-gradient(135deg,var(--neon),var(--deep));color:#001020}
+.pf-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pf-chip{
+  border:1px solid var(--border);background:rgba(79,195,255,.05);color:var(--text);
+  padding:8px 16px;border-radius:50px;font:inherit;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:.3s;
+}
+.pf-chip em{font-style:normal;margin-left:7px;font-size:.7rem;opacity:.65}
+.pf-chip:hover{border-color:var(--neon);color:var(--neon);transform:translateY(-2px)}
+.pf-chip.active{background:linear-gradient(135deg,var(--neon),var(--deep));color:#001020;border-color:transparent}
+.pf-count{margin-top:14px;font-size:.8rem;color:var(--sub)}
+.pf-count kbd{
+  font-family:inherit;font-size:.72rem;padding:1px 7px;border-radius:6px;
+  border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);
+}
+.pf-empty{
+  text-align:center;padding:60px 20px;border:1px dashed var(--border);border-radius:26px;
+  color:var(--sub);background:rgba(8,18,43,.5);
+}
+.pf-empty[hidden]{display:none}
+.pf-empty .pf-empty-ico{font-size:2.6rem;display:block;margin-bottom:12px}
+.pf-empty h3{font-family:'Syne',sans-serif;color:#fff;margin-bottom:6px}
+.pf-empty button{margin-top:18px}
+
+/* tarjetas */
+.live-pf-card{--pf-accent:var(--neon);display:flex;flex-direction:column}
+.live-pf-card::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;transition:.35s;
+  background:radial-gradient(380px circle at var(--mx,50%) var(--my,0%),rgba(79,195,255,.13),transparent 42%);
+}
+.live-pf-card:hover::before{opacity:1}
+.live-pf-card::after{
+  content:'';position:absolute;left:0;right:0;top:0;height:3px;z-index:3;
+  background:linear-gradient(90deg,transparent,var(--pf-accent),transparent);opacity:.85;
+}
+.live-pf-card:hover{border-color:var(--pf-accent)}
+.live-pf-browserbody{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--pf-accent) 24%,transparent),rgba(0,242,254,.04)),#071532;
+}
+.live-pf-browserbody .site-loading::after{background:linear-gradient(90deg,var(--deep),var(--pf-accent))}
+.live-pf-info{flex:1;display:flex;flex-direction:column;position:relative;z-index:2}
+.live-pf-info p{flex:0 0 auto}
+.live-pf-actions{margin-top:auto}
+.live-pf-fav{
+  position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border-radius:50%;
+  background:rgba(5,12,31,.72);border:1px solid var(--border);color:#fff;font-size:1.05rem;
+  cursor:pointer;backdrop-filter:blur(6px);transition:.3s;display:grid;place-items:center;
+}
+.live-pf-fav:hover{transform:scale(1.12);border-color:#ff5d8f;color:#ff5d8f}
+.live-pf-fav.on{color:#ff5d8f;border-color:rgba(255,93,143,.55);background:rgba(255,93,143,.14)}
+.live-pf-ribbon{
+  position:absolute;top:16px;left:16px;z-index:5;font-size:.64rem;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;padding:5px 12px;border-radius:50px;color:#001020;
+  background:linear-gradient(135deg,var(--green),var(--accent));box-shadow:0 6px 18px rgba(0,255,136,.25);
+}
+.live-pf-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.live-pf-cat{
+  font-size:.66rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--pf-accent);
+  padding:3px 10px;border-radius:50px;border:1px solid var(--border);background:rgba(255,255,255,.03);
+}
+.live-pf-domain{font-size:.72rem;color:var(--sub)}
+.live-pf-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.live-pf-tag{
+  font-size:.68rem;padding:3px 10px;border-radius:50px;color:var(--sub);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+}
+.live-pf-btn.icon{padding:9px 13px}
+
+/* vista lista */
+.live-pf-grid.is-list{grid-template-columns:1fr}
+.live-pf-grid.is-list .live-pf-card{display:grid;grid-template-columns:300px 1fr}
+.live-pf-grid.is-list .live-pf-preview{height:100%;min-height:210px}
+.live-pf-grid.is-list .live-pf-browser{bottom:18px;height:auto}
+.live-pf-grid.is-list .live-pf-browserbody{height:calc(100% - 25px)}
+@media(max-width:760px){
+  .live-pf-grid.is-list .live-pf-card{grid-template-columns:1fr}
+  .live-pf-grid.is-list .live-pf-preview{height:205px;min-height:0}
+  .pf-toolbar{padding:16px}
+  .pf-select{flex:1 1 150px}
+}
+
+/* modal: barra de herramientas */
+.pf-modal-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 5px 14px}
+.pf-mb-group{display:flex;gap:6px;align-items:center}
+.pf-mb-btn{
+  height:38px;min-width:38px;padding:0 13px;border-radius:12px;border:1px solid var(--border);
+  background:rgba(79,195,255,.06);color:var(--text);cursor:pointer;font:inherit;font-size:.8rem;font-weight:600;
+  transition:.3s;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.pf-mb-btn:hover{border-color:var(--neon);color:var(--neon)}
+.pf-mb-btn.active{background:rgba(79,195,255,.18);border-color:var(--neon);color:var(--neon)}
+.pf-mb-counter{font-size:.8rem;color:var(--sub);padding:0 8px;min-width:56px;text-align:center}
+.live-pf-iframe-wrap{margin-left:auto;margin-right:auto;transition:max-width .5s cubic-bezier(.2,1,.3,1)}
+.live-pf-iframe-wrap.dev-tablet{max-width:820px}
+.live-pf-iframe-wrap.dev-mobile{max-width:400px}
+.pf-loadbar{
+  position:absolute;left:0;top:0;height:3px;width:0;z-index:4;opacity:1;
+  background:linear-gradient(90deg,var(--deep),var(--neon),var(--green));
+}
+.pf-loadbar.loading{width:85%;transition:width 4s cubic-bezier(.1,.8,.2,1)}
+.pf-loadbar.done{width:100%;opacity:0;transition:width .3s,opacity .6s .3s}
+.pf-fb-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+@media(max-width:700px){.pf-devices{display:none}}
+
+/* toast */
+.pf-toast{
+  position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);z-index:7000;
+  background:#0a1f50;border:1px solid rgba(79,195,255,.4);color:#fff;font-size:.85rem;font-weight:500;
+  padding:12px 22px;border-radius:50px;box-shadow:0 16px 40px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:.35s;max-width:90vw;text-align:center;
+}
+.pf-toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* botón lateral: subir al inicio */
+.scroll-top{
+  position:fixed;right:18px;top:50%;width:56px;height:56px;border-radius:50%;border:0;padding:0;
+  background:rgba(7,16,42,.9);backdrop-filter:blur(10px);cursor:pointer;z-index:4400;
+  display:grid;place-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 1px rgba(79,195,255,.15);
+  opacity:0;visibility:hidden;transform:translate(40px,-50%);
+  transition:opacity .35s,transform .35s,visibility .35s,box-shadow .3s;
+}
+.scroll-top.show{opacity:1;visibility:visible;transform:translate(0,-50%)}
+.scroll-top.show:hover{transform:translate(0,calc(-50% - 4px));box-shadow:0 14px 34px rgba(0,114,255,.45),0 0 0 1px rgba(79,195,255,.4)}
+.scroll-top:focus-visible{outline:2px solid var(--neon);outline-offset:4px}
+.scroll-top .st-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.scroll-top .st-track{fill:none;stroke:rgba(79,195,255,.16);stroke-width:3}
+.scroll-top .st-prog{fill:none;stroke:url(#stGrad);stroke-width:3;stroke-linecap:round;stroke-dasharray:132;stroke-dashoffset:132}
+.scroll-top .st-arrow{position:relative;width:22px;height:22px;color:var(--neon);transition:.3s}
+.scroll-top:hover .st-arrow{transform:translateY(-3px);color:#fff}
+.scroll-top::before{
+  content:attr(data-label);position:absolute;right:calc(100% + 12px);top:50%;
+  transform:translate(8px,-50%);white-space:nowrap;font-size:.75rem;font-weight:600;
+  background:#0a1f50;border:1px solid rgba(79,195,255,.3);color:#fff;padding:6px 12px;border-radius:50px;
+  opacity:0;pointer-events:none;transition:.3s;
+}
+.scroll-top:hover::before{opacity:1;transform:translate(0,-50%)}
+@media(max-width:600px){
+  .scroll-top{width:46px;height:46px;right:10px}
+  .scroll-top .st-arrow{width:18px;height:18px}
+  .scroll-top::before{display:none}
+}
+@media print{.scroll-top,.pf-toast{display:none}}
+
 /* ─── FOOTER ─── */
 footer{
   background:#030912;border-top:1px solid var(--border);
@@ -543,10 +956,15 @@ footer p{color:var(--sub);font-size:.85rem}
     <li><a href="#software">Software</a></li>
     <li><a href="#team">Equipo</a></li>
     <li><a href="#hardware">Hardware</a></li>
-    <li><a href="#portfolio">Portafolio</a></li>
+    <li><a href="#portfolio">Portafolio</a>
+      <a href="#web-portfolio">Webs</a></li>
+    <li><a href="#web-portfolio">Webs</a></li>
     <li><a href="#repair">Soporte</a></li>
   </ul>
-  <a href="sms:+13853949996" class="nav-cta">💬 Contactar</a>
+  <div style="display:flex;align-items:center;">
+    <a href="sms:+13853949996" class="nav-cta">💬 Contactar</a>
+    <button class="nav-pay-btn" onclick="openPaymentModal()">💳 Pagar</button>
+  </div>
   <button class="hamburger" onclick="toggleMenu()" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
     <span></span><span></span><span></span>
   </button>
@@ -558,7 +976,9 @@ footer p{color:var(--sub);font-size:.85rem}
   <a href="#team" onclick="toggleMenu()">Equipo</a>
   <a href="#hardware" onclick="toggleMenu()">Hardware</a>
   <a href="#portfolio" onclick="toggleMenu()">Portafolio</a>
+  <a href="#web-portfolio" onclick="toggleMenu()">Webs</a>
   <a href="#repair" onclick="toggleMenu()">Soporte</a>
+  <a href="javascript:void(0)" onclick="toggleMenu();openPaymentModal()" style="color:var(--green)">💳 Realizar Pago</a>
   <a href="sms:+13853949996" style="color:var(--neon)">💬 Enviar SMS</a>
 </div>
 
@@ -572,6 +992,7 @@ footer p{color:var(--sub);font-size:.85rem}
     <p>Software, Hardware & Redes de clase mundial. Transformamos negocios con tecnología a medida en Utah y más allá.</p>
     <div class="hero-btns">
       <a href="#software" class="btn-primary">Ver Servicios</a>
+      <button class="btn-pay" onclick="openPaymentModal()">💳 Realizar un Pago</button>
       <button class="btn-outline" onclick="openChat()">🤖 Hablar con IA</button>
     </div>
   </div>
@@ -813,6 +1234,7 @@ footer p{color:var(--sub);font-size:.85rem}
         </ul>
         <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap">
           <a href="sms:+13853949996" class="btn-primary">📲 Solicitar Soporte</a>
+          <button class="btn-pay" onclick="openPaymentModal('Soporte Técnico')">💳 Pagar Servicio</button>
           <button class="btn-outline" onclick="openChat()">Hablar con IA →</button>
         </div>
       </div>
@@ -857,6 +1279,55 @@ footer p{color:var(--sub);font-size:.85rem}
   </div>
 </section>
 
+
+<!-- LIVE WEBSITE PORTFOLIO -->
+<section id="web-portfolio" class="live-portfolio-section">
+  <div class="wrap">
+    <div class="sec-head fade-in">
+      <span class="sec-label">▸ Sitios Web Desarrollados</span>
+      <h2 class="sec-title">Portafolio Web Interactivo</h2>
+      <p class="sec-sub">Explora nuestros sitios directamente desde aquí. Haz clic en cualquier proyecto para abrir una vista previa interactiva y, si quieres, entrar al sitio completo.</p>
+    </div>
+
+    <div class="pf-stats fade-in">
+      <div class="pf-stat"><span class="pf-stat-ico">🌐</span><div><b id="pf-stat-sites">0</b><small>Sitios publicados</small></div></div>
+      <div class="pf-stat"><span class="pf-stat-ico">🗂️</span><div><b id="pf-stat-cats">0</b><small>Categorías</small></div></div>
+      <div class="pf-stat"><span class="pf-stat-ico">♥</span><div><b id="pf-stat-favs">0</b><small>Tus favoritos</small></div></div>
+    </div>
+
+    <div class="pf-toolbar fade-in">
+      <div class="pf-controls">
+        <label class="pf-search" id="pf-search-wrap">
+          <span class="pf-s-ico" aria-hidden="true">🔎</span>
+          <input id="pf-search" type="text" autocomplete="off" placeholder="Buscar proyecto, categoría o etiqueta…" aria-label="Buscar proyectos del portafolio">
+          <button type="button" id="pf-clear" aria-label="Limpiar búsqueda">×</button>
+        </label>
+        <select id="pf-sort" class="pf-select" aria-label="Ordenar proyectos">
+          <option value="default">Orden original</option>
+          <option value="new">Más recientes primero</option>
+          <option value="az">Nombre A → Z</option>
+          <option value="favs">Favoritos primero</option>
+        </select>
+        <div class="pf-view" role="group" aria-label="Tipo de vista">
+          <button type="button" data-view="grid" class="active" aria-label="Vista en cuadrícula" aria-pressed="true" title="Cuadrícula">▦</button>
+          <button type="button" data-view="list" aria-label="Vista en lista" aria-pressed="false" title="Lista">☰</button>
+        </div>
+      </div>
+      <div class="pf-chips" id="pf-chips" role="group" aria-label="Filtrar por categoría"></div>
+      <div class="pf-count" id="pf-count" aria-live="polite"></div>
+    </div>
+
+    <div class="live-pf-grid" id="live-pf-grid"></div>
+
+    <div class="pf-empty" id="pf-empty" hidden>
+      <span class="pf-empty-ico">🔍</span>
+      <h3>No encontramos proyectos con ese filtro</h3>
+      <p>Prueba con otra palabra o restablece los filtros.</p>
+      <button type="button" class="btn-outline" onclick="resetPfFilters()">Restablecer filtros</button>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
@@ -868,17 +1339,112 @@ footer p{color:var(--sub);font-size:.85rem}
       <a href="#hardware">Hardware</a>
       <a href="#portfolio">Portafolio</a>
       <a href="#repair">Soporte</a>
+      <a href="javascript:void(0)" onclick="openPaymentModal()" style="color:var(--green)">Pagar en línea</a>
       <a href="sms:+13853949996">+1 (385) 394-9996</a>
     </div>
     <div class="footer-bottom">© 2026 Appline Studio LLC · Utah, USA · Todos los derechos reservados</div>
   </div>
 </footer>
 
-<!-- MODAL -->
+
+<!-- MODAL DE VISTA PREVIA DE SITIOS WEB -->
+<div id="live-pf-modal" class="modal live-pf-modal" onclick="handleLivePfModalClick(event)">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeLivePortfolioModal()" aria-label="Cerrar vista previa">×</button>
+    <div class="live-pf-modal-head">
+      <div>
+        <div class="live-pf-modal-title" id="live-pf-modal-title">Vista previa del sitio</div>
+        <div class="live-pf-modal-url" id="live-pf-modal-url"></div>
+      </div>
+    </div>
+    <div class="pf-modal-bar">
+      <div class="pf-mb-group">
+        <button type="button" class="pf-mb-btn" onclick="pfNav(-1)" aria-label="Proyecto anterior" title="Anterior (←)">←</button>
+        <span class="pf-mb-counter" id="pf-mb-counter">1 / 1</span>
+        <button type="button" class="pf-mb-btn" onclick="pfNav(1)" aria-label="Proyecto siguiente" title="Siguiente (→)">→</button>
+      </div>
+      <div class="pf-mb-group pf-devices" role="group" aria-label="Tamaño de pantalla">
+        <button type="button" class="pf-mb-btn active" data-device="desktop" onclick="pfSetDevice('desktop')">🖥 Escritorio</button>
+        <button type="button" class="pf-mb-btn" data-device="tablet" onclick="pfSetDevice('tablet')">▭ Tablet</button>
+        <button type="button" class="pf-mb-btn" data-device="mobile" onclick="pfSetDevice('mobile')">📱 Móvil</button>
+      </div>
+      <div class="pf-mb-group">
+        <button type="button" class="pf-mb-btn" onclick="pfReload()" title="Recargar vista previa">⟳ Recargar</button>
+        <button type="button" class="pf-mb-btn" onclick="pfCopyCurrent()" title="Copiar enlace">🔗 Copiar</button>
+      </div>
+    </div>
+    <div class="live-pf-iframe-wrap">
+      <div class="pf-loadbar" id="pf-loadbar"></div>
+      <iframe id="live-pf-iframe" class="live-pf-iframe" title="Vista previa del sitio web" loading="lazy"></iframe>
+      <div class="live-pf-fallback" id="live-pf-fallback">
+        <div class="live-pf-fallback-icon">🌐</div>
+        <h3>Vista previa no disponible dentro del marco</h3>
+        <p>Este sitio puede bloquear las vistas embebidas por seguridad. Puedes abrirlo directamente en una nueva pestaña.</p>
+        <div class="pf-fb-row">
+          <a id="live-pf-fallback-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Abrir sitio completo ↗</a>
+          <button type="button" class="btn-outline" id="pf-hide-fallback">Ya cargó, ocultar aviso</button>
+        </div>
+      </div>
+    </div>
+    <div class="m-cta-row" style="justify-content:flex-end">
+      <a id="live-pf-open-btn" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">🚀 Visitar sitio completo</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INFORMATIVO -->
 <div id="modal" class="modal" onclick="handleModalClick(event)">
   <div class="modal-inner">
     <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">×</button>
     <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- MODAL DE PAGO STRIPE -->
+<div id="payment-modal" class="modal" onclick="handlePayModalClick(event)">
+  <div class="modal-inner" style="max-width:550px;">
+    <button class="modal-close" onclick="closePaymentModal()" aria-label="Cerrar">×</button>
+    <h2>💳 Portal de Pagos</h2>
+    <p class="m-sub">Procesamiento seguro con cifrado de grado bancario (Stripe)</p>
+
+    <form id="payment-form" onsubmit="handlePaymentSubmit(event)">
+      <div class="pay-form-group">
+        <label for="pay-name">Nombre completo</label>
+        <input type="text" id="pay-name" required placeholder="Ej. Marcos Torres">
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-email">Correo Electrónico</label>
+        <input type="email" id="pay-email" required placeholder="cliente@ejemplo.com">
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-service">Servicio / Concepto</label>
+        <select id="pay-service" required>
+          <option value="Custom Software">Custom Software / Desarrollo</option>
+          <option value="Web Development">Desarrollo Web / Landing Page</option>
+          <option value="POS System">Sistema POS</option>
+          <option value="Soporte Tecnico">Soporte Técnico / Reparación</option>
+          <option value="Hardware / Equipos">Hardware / Venta de Equipos</option>
+          <option value="Otro Servicio">Otro / Pago de Factura Custom</option>
+        </select>
+      </div>
+
+      <div class="pay-form-group">
+        <label for="pay-amount">Monto a Pagar (USD)</label>
+        <input type="number" id="pay-amount" min="1" step="0.01" required placeholder="0.00">
+      </div>
+
+      <div class="pay-form-group">
+        <label>Información de Tarjeta</label>
+        <div id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
+      </div>
+
+      <button type="submit" id="pay-submit-btn" class="btn-pay" style="width:100%;justify-content:center;margin-top:10px;">
+        🔒 Procesar Pago Seguro
+      </button>
+    </form>
   </div>
 </div>
 
@@ -887,7 +1453,7 @@ footer p{color:var(--sub);font-size:.85rem}
   <div class="chat-head">
     <div class="chat-ai-name">
       <span class="ai-dot"></span>
-      <div><h4>Appline AI</h4><small>Claude-powered · Siempre activo</small></div>
+      <div><h4>Appline AI</h4><small>Siempre activo</small></div>
     </div>
     <button class="chat-close-btn" onclick="closeChat()" aria-label="Cerrar chat">×</button>
   </div>
@@ -906,16 +1472,146 @@ footer p{color:var(--sub);font-size:.85rem}
   <a href="sms:+13853949996" class="fab-sms" title="Enviar SMS" aria-label="Enviar SMS">💬</a>
 </div>
 
-<script>
-// ─── CONFIGURACIÓN DEL CHAT ───
-// IMPORTANTE: la API de Anthropic NO se puede llamar de forma segura directo desde el
-// navegador (bloqueo CORS + expondría tu API key públicamente). Este endpoint debe ser
-// un backend propio (ej. una función serverless en Vercel/Cloudflare/Netlify) que reciba
-// el mensaje del usuario, llame a la API de Anthropic guardando la key en el servidor,
-// y devuelva { reply: "texto de respuesta" }. Cambia esta URL por la de tu backend real.
-const CHAT_BACKEND_URL = "https://TU-BACKEND-AQUI.com/api/chat";
+<!-- BOTÓN LATERAL: SUBIR AL INICIO -->
+<button type="button" id="scroll-top" class="scroll-top" aria-label="Subir al inicio de la página" title="Subir al inicio" data-label="Subir al inicio">
+  <svg class="st-ring" viewBox="0 0 48 48" aria-hidden="true">
+    <defs>
+      <linearGradient id="stGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4fc3ff"/>
+        <stop offset="100%" stop-color="#00ff88"/>
+      </linearGradient>
+    </defs>
+    <circle class="st-track" cx="24" cy="24" r="21"/>
+    <circle class="st-prog" cx="24" cy="24" r="21"/>
+  </svg>
+  <svg class="st-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>
+  </svg>
+</button>
 
-// ─── MODULE METADATA (para interconexión entre módulos) ───
+<div class="pf-toast" id="pf-toast" role="status" aria-live="polite"></div>
+
+<script>
+// ─── CONFIGURACIÓN DE STRIPE ───
+// Clave pública de prueba asignada
+const STRIPE_PUBLIC_KEY = "pk_test_TYooA4J0D25a38QM92qBf41n"; 
+let stripe, cardElement;
+
+if (typeof Stripe !== 'undefined') {
+  stripe = Stripe(STRIPE_PUBLIC_KEY);
+  const elements = stripe.elements();
+  
+  cardElement = elements.create('card', {
+    style: {
+      base: {
+        color: '#e8f4ff',
+        fontFamily: "'Inter', sans-serif",
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': { color: '#7ba8d4' }
+      },
+      invalid: {
+        color: '#ff5555',
+        iconColor: '#ff5555'
+      }
+    }
+  });
+}
+
+function openPaymentModal(serviceName = '') {
+  document.getElementById('payment-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  if (cardElement && !document.getElementById('card-element').hasChildNodes()) {
+    cardElement.mount('#card-element');
+    cardElement.on('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      displayError.textContent = event.error ? event.error.message : '';
+    });
+  }
+
+  if (serviceName) {
+    const select = document.getElementById('pay-service');
+    for (let option of select.options) {
+      if (option.value.toLowerCase().includes(serviceName.toLowerCase())) {
+        option.selected = true;
+        break;
+      }
+    }
+  }
+}
+
+function closePaymentModal() {
+  document.getElementById('payment-modal').classList.remove('open');
+  document.body.style.overflow = 'auto';
+}
+
+function handlePayModalClick(e) {
+  if (e.target === document.getElementById('payment-modal')) closePaymentModal();
+}
+
+async function handlePaymentSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('pay-submit-btn');
+  const errorElement = document.getElementById('card-errors');
+  errorElement.textContent = '';
+  
+  btn.disabled = true;
+  btn.innerText = '⏳ Procesando pago...';
+
+  const name = document.getElementById('pay-name').value;
+  const email = document.getElementById('pay-email').value;
+  const service = document.getElementById('pay-service').value;
+  const amount = document.getElementById('pay-amount').value;
+
+  try {
+    // Llama al endpoint de tu backend que genera el PaymentIntent
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: parseFloat(amount) * 100, currency: 'usd', name, email, service })
+    });
+
+    const data = await response.json();
+
+    if (!data.clientSecret) {
+      throw new Error(data.error || 'No se pudo generar la transacción. Asegúrate de configurar tu backend.');
+    }
+
+    // Confirma el pago mediante Stripe Elements
+    const result = await stripe.confirmCardPayment(data.clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: { name, email }
+      }
+    });
+
+    if (result.error) {
+      errorElement.textContent = result.error.message;
+      btn.disabled = false;
+      btn.innerText = '🔒 Procesar Pago Seguro';
+    } else if (result.paymentIntent.status === 'succeeded') {
+      btn.innerText = '✅ ¡Pago Exitoso!';
+      btn.style.background = '#00ff88';
+      setTimeout(() => {
+        alert('¡Gracias! Tu pago fue procesado con éxito.');
+        closePaymentModal();
+        btn.disabled = false;
+        btn.innerText = '🔒 Procesar Pago Seguro';
+        btn.style.background = 'linear-gradient(135deg,var(--green),#00b359)';
+      }, 1000);
+    }
+  } catch (err) {
+    errorElement.textContent = err.message || 'Error al conectar con el servidor de pago.';
+    btn.disabled = false;
+    btn.innerText = '🔒 Procesar Pago Seguro';
+  }
+}
+
+// ─── CONFIGURACIÓN DEL CHAT ───
+const CHAT_BACKEND_URL = "/api/chat";
+
+// ─── METADATOS DE MÓDULOS ───
 const moduleMeta = {
   software:{icon:'💻',label:'Custom Software'},
   web:{icon:'🌐',label:'Web Development'},
@@ -935,7 +1631,422 @@ function relatedHTML(ids){
   return `<div class="m-related"><h5>🔗 Módulos Relacionados</h5><div class="m-related-row">${ids.map(id=>`<button class="m-related-link" onclick="openModal('${id}')">${moduleMeta[id].icon} ${moduleMeta[id].label}</button>`).join('')}</div></div>`;
 }
 
-// ─── MODAL DATA ───
+
+// ─── PORTAFOLIO WEB EN VIVO ───
+const livePortfolio = [
+  {
+    name:'Appline Studio',
+    url:'https://applinestudio.com/',
+    icon:'⚡',
+    description:'Sitio principal de Appline Studio — IT, software, hardware y soluciones digitales.',
+    category:'Corporativo', accent:'#4fc3ff', tags:['IT','Software','Hardware']
+  },
+  {
+    name:'Appline Studio · Tienda',
+    url:'https://studioappline-art.github.io/tienda/#',
+    icon:'🛒',
+    description:'Experiencia de tienda online con catálogo y presentación de productos.',
+    category:'E-commerce', accent:'#ffb347', tags:['Tienda online','Catálogo']
+  },
+  {
+    name:'ProClean Crew',
+    url:'https://studioappline-art.github.io/procleancrew/',
+    icon:'✨',
+    description:'Sitio web profesional para servicios de limpieza y presentación comercial.',
+    category:'Servicios', accent:'#00ff88', tags:['Limpieza','Landing page','Utah']
+  },
+  {
+    name:'Zentaurix',
+    url:'https://studioappline-art.github.io/zentaurix/#inicio',
+    icon:'◈',
+    description:'Proyecto web con identidad visual y experiencia de navegación personalizada.',
+    category:'Marca', accent:'#b388ff', tags:['Identidad visual','Navegación']
+  },
+  {
+    name:'Tienda Commerce',
+    url:'https://studioappline-art.github.io/tiendacommeerce/',
+    icon:'🛍️',
+    description:'Concepto de e-commerce orientado a catálogo, productos y conversión.',
+    category:'E-commerce', accent:'#ff7a90', tags:['Catálogo','Conversión']
+  },
+  {
+    name:'MyUtahSpot',
+    url:'https://myutahspot.com/index.html',
+    icon:'📍',
+    description:'Directorio comunitario de negocios y servicios locales en Utah, con publicación gratuita.',
+    category:'Directorio', accent:'#00f2fe', tags:['Directorio','Utah','Publicación gratis'], isNew:true
+  }
+];
+
+function pfHost(u){
+  try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return u; }
+}
+
+function renderLivePortfolio(){
+  const grid=document.getElementById('live-pf-grid');
+  if(!grid) return;
+  grid.innerHTML=livePortfolio.map((site,i)=>`
+    <article class="live-pf-card fade-in" data-index="${i}" data-cat="${site.category}" style="animation-delay:${i*.08}s;--pf-accent:${site.accent||'#4fc3ff'}" onclick="openLivePortfolioModal(${i})" tabindex="0" role="button" aria-label="Ver vista previa de ${site.name}">
+      ${site.isNew?'<span class="live-pf-ribbon">Nuevo</span>':''}
+      <button class="live-pf-fav" type="button" data-index="${i}" aria-label="Marcar ${site.name} como favorito" aria-pressed="false" onclick="event.stopPropagation();togglePfFav(${i})">♡</button>
+      <div class="live-pf-preview">
+        <div class="live-pf-browser">
+          <div class="live-pf-browserbar">
+            <span class="live-pf-dot"></span><span class="live-pf-dot"></span><span class="live-pf-dot"></span>
+            <span class="live-pf-url">${site.url}</span>
+          </div>
+          <div class="live-pf-browserbody">
+            <div class="site-symbol">${site.icon}</div>
+            <div class="site-loading"></div>
+          </div>
+        </div>
+      </div>
+      <div class="live-pf-info">
+        <div class="live-pf-meta">
+          <span class="live-pf-cat">${site.category}</span>
+          <span class="live-pf-domain">${pfHost(site.url)}</span>
+        </div>
+        <div class="live-pf-topline">
+          <h3>${site.name}</h3>
+          <span class="live-pf-status">● Live</span>
+        </div>
+        <p>${site.description}</p>
+        <div class="live-pf-tags">${(site.tags||[]).map(t=>`<span class="live-pf-tag">${t}</span>`).join('')}</div>
+        <div class="live-pf-actions">
+          <button class="live-pf-btn" type="button" onclick="event.stopPropagation();openLivePortfolioModal(${i})">👁 Vista previa</button>
+          <a class="live-pf-btn primary" href="${site.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Visitar ↗</a>
+          <button class="live-pf-btn icon" type="button" aria-label="Copiar enlace de ${site.name}" title="Copiar enlace" onclick="event.stopPropagation();copyPfLink(${i})">🔗</button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+  },{threshold:.12});
+  grid.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+  grid.querySelectorAll('.live-pf-card').forEach((card,index)=>{
+    card.addEventListener('keydown',e=>{
+      if(e.target!==card) return;
+      if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openLivePortfolioModal(index); }
+    });
+  });
+
+  // Funciones avanzadas (filtros, favoritos, vistas…)
+  if(typeof initPortfolioControls==='function') initPortfolioControls();
+}
+
+function openLivePortfolioModal(index){
+  const site=livePortfolio[index];
+  if(!site) return;
+  const modal=document.getElementById('live-pf-modal');
+  const iframe=document.getElementById('live-pf-iframe');
+  const fallback=document.getElementById('live-pf-fallback');
+  const openBtn=document.getElementById('live-pf-open-btn');
+  const fallbackLink=document.getElementById('live-pf-fallback-link');
+
+  document.getElementById('live-pf-modal-title').textContent=site.name;
+  document.getElementById('live-pf-modal-url').textContent=site.url;
+  openBtn.href=site.url;
+  fallbackLink.href=site.url;
+  fallback.classList.remove('show');
+
+  iframe.src='about:blank';
+  setTimeout(()=>{
+    iframe.src=site.url;
+    // Algunos sitios bloquean iframes mediante X-Frame-Options/CSP.
+    // El fallback se muestra como opción de apertura directa después de unos segundos.
+    clearTimeout(window._pfFallbackTimer);
+    window._pfFallbackTimer=setTimeout(()=>fallback.classList.add('show'),5000);
+  },30);
+
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeLivePortfolioModal(){
+  const modal=document.getElementById('live-pf-modal');
+  const iframe=document.getElementById('live-pf-iframe');
+  modal.classList.remove('open');
+  clearTimeout(window._pfFallbackTimer);
+  iframe.src='about:blank';
+  document.getElementById('live-pf-fallback').classList.remove('show');
+  document.body.style.overflow='auto';
+}
+
+function handleLivePfModalClick(e){
+  if(e.target===document.getElementById('live-pf-modal')) closeLivePortfolioModal();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && document.getElementById('live-pf-modal')?.classList.contains('open')){
+    closeLivePortfolioModal();
+  }
+});
+
+// ─── PORTAFOLIO WEB: FUNCIONES AVANZADAS ───
+// Búsqueda, filtros, orden, vista cuadrícula/lista, favoritos, copiar enlace,
+// navegación y simulador de dispositivos en la vista previa, y botón lateral "subir".
+(function(){
+  const $=id=>document.getElementById(id);
+  const norm=s=>(s||'').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const FAV_KEY='applinePortfolioFavs', VIEW_KEY='applinePortfolioView';
+  const state={q:'',cat:'Todos',sort:'default',view:'grid'};
+  const reduceMotion=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let favs=new Set();
+  try{ favs=new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]')); }catch(e){}
+  const saveFavs=()=>{ try{ localStorage.setItem(FAV_KEY,JSON.stringify([...favs])); }catch(e){} };
+  const favCount=()=>livePortfolio.filter(s=>favs.has(s.url)).length;
+
+  // ── Toast ──
+  let toastTimer;
+  function toast(msg){
+    const t=$('pf-toast'); if(!t) return;
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  }
+
+  // ── Copiar enlace ──
+  function copyText(text){
+    if(navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise((res,rej)=>{
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.style.cssText='position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy') ? res() : rej(); }catch(e){ rej(e); }
+      ta.remove();
+    });
+  }
+  window.copyPfLink=function(i){
+    const s=livePortfolio[i]; if(!s) return;
+    copyText(s.url).then(()=>toast('🔗 Enlace copiado: '+pfHost(s.url))).catch(()=>toast('No se pudo copiar el enlace'));
+  };
+
+  // ── Estadísticas ──
+  function countUp(el,target){
+    if(!el) return;
+    if(reduceMotion || target===0){ el.textContent=target; return; }
+    const t0=performance.now(), dur=900;
+    (function step(now){
+      const p=Math.min(1,(now-t0)/dur);
+      el.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+      if(p<1) requestAnimationFrame(step);
+    })(t0);
+  }
+  function updateFavStat(){ const el=$('pf-stat-favs'); if(el) el.textContent=favCount(); }
+
+  // ── Chips de categoría ──
+  function buildChips(){
+    const box=$('pf-chips'); if(!box) return;
+    const cats=[...new Set(livePortfolio.map(s=>s.category))];
+    const items=[
+      {id:'Todos',label:'Todos',n:livePortfolio.length},
+      ...cats.map(c=>({id:c,label:c,n:livePortfolio.filter(s=>s.category===c).length})),
+      {id:'__favs',label:'♥ Favoritos',n:favCount()}
+    ];
+    box.innerHTML=items.map(it=>`<button type="button" class="pf-chip${state.cat===it.id?' active':''}" data-cat="${it.id}" aria-pressed="${state.cat===it.id}">${it.label}<em>${it.n}</em></button>`).join('');
+  }
+
+  // ── Aplicar filtros / orden ──
+  function apply(){
+    const grid=$('live-pf-grid'); if(!grid) return;
+    const q=norm(state.q.trim());
+    let shown=0;
+    grid.querySelectorAll('.live-pf-card').forEach(card=>{
+      const s=livePortfolio[+card.dataset.index];
+      const hay=norm([s.name,s.category,s.description,(s.tags||[]).join(' '),pfHost(s.url)].join(' '));
+      const catOk = state.cat==='Todos' || (state.cat==='__favs' ? favs.has(s.url) : s.category===state.cat);
+      const ok = catOk && (!q || hay.includes(q));
+      card.style.display = ok ? '' : 'none';
+      if(ok) shown++;
+    });
+
+    const idx=livePortfolio.map((_,i)=>i);
+    if(state.sort==='az') idx.sort((a,b)=>livePortfolio[a].name.localeCompare(livePortfolio[b].name,'es'));
+    else if(state.sort==='new') idx.reverse();
+    else if(state.sort==='favs') idx.sort((a,b)=>(favs.has(livePortfolio[b].url)-favs.has(livePortfolio[a].url))||(a-b));
+    idx.forEach((i,pos)=>{
+      const c=grid.querySelector('.live-pf-card[data-index="'+i+'"]');
+      if(c) c.style.order=pos;
+    });
+
+    const total=livePortfolio.length, count=$('pf-count');
+    if(count) count.innerHTML = shown===total
+      ? total+' proyectos publicados · pulsa <kbd>/</kbd> para buscar'
+      : 'Mostrando '+shown+' de '+total+' proyectos';
+    const empty=$('pf-empty'); if(empty) empty.hidden = shown>0;
+  }
+
+  window.resetPfFilters=function(){
+    state.q=''; state.cat='Todos'; state.sort='default';
+    const inp=$('pf-search'), sel=$('pf-sort');
+    if(inp) inp.value=''; if(sel) sel.value='default';
+    $('pf-search-wrap')?.classList.remove('has-text');
+    buildChips(); apply();
+  };
+
+  // ── Favoritos ──
+  function syncFavButtons(){
+    document.querySelectorAll('.live-pf-fav').forEach(b=>{
+      const on=favs.has(livePortfolio[+b.dataset.index].url);
+      b.classList.toggle('on',on);
+      b.setAttribute('aria-pressed',on);
+      b.textContent=on?'♥':'♡';
+    });
+  }
+  window.togglePfFav=function(i){
+    const s=livePortfolio[i]; if(!s) return;
+    if(favs.has(s.url)){ favs.delete(s.url); toast('Quitado de favoritos'); }
+    else { favs.add(s.url); toast('♥ '+s.name+' guardado en favoritos'); }
+    saveFavs(); syncFavButtons(); buildChips(); updateFavStat(); apply();
+  };
+
+  // ── Vista cuadrícula / lista ──
+  function setView(v){
+    state.view=v;
+    $('live-pf-grid')?.classList.toggle('is-list',v==='list');
+    document.querySelectorAll('.pf-view button').forEach(b=>{
+      const on=b.dataset.view===v;
+      b.classList.toggle('active',on); b.setAttribute('aria-pressed',on);
+    });
+    try{ localStorage.setItem(VIEW_KEY,v); }catch(e){}
+  }
+
+  // ── Inicialización (la llama renderLivePortfolio) ──
+  let wired=false;
+  window.initPortfolioControls=function(){
+    buildChips(); syncFavButtons(); updateFavStat();
+    let saved='grid'; try{ saved=localStorage.getItem(VIEW_KEY)||'grid'; }catch(e){}
+    setView(saved==='list'?'list':'grid');
+    apply();
+    if(wired) return; wired=true;
+
+    const inp=$('pf-search'), wrap=$('pf-search-wrap');
+    inp?.addEventListener('input',()=>{
+      state.q=inp.value; wrap.classList.toggle('has-text',!!inp.value); apply();
+    });
+    $('pf-clear')?.addEventListener('click',()=>{
+      inp.value=''; state.q=''; wrap.classList.remove('has-text'); apply(); inp.focus();
+    });
+    $('pf-sort')?.addEventListener('change',e=>{ state.sort=e.target.value; apply(); });
+    document.querySelectorAll('.pf-view button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+    $('pf-chips')?.addEventListener('click',e=>{
+      const b=e.target.closest('.pf-chip'); if(!b) return;
+      state.cat=b.dataset.cat; buildChips(); apply();
+    });
+
+    // Resplandor que sigue al cursor
+    $('live-pf-grid')?.addEventListener('pointermove',e=>{
+      const card=e.target.closest('.live-pf-card'); if(!card) return;
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+      card.style.setProperty('--my',(e.clientY-r.top)+'px');
+    });
+
+    // Atajo "/" para buscar
+    document.addEventListener('keydown',e=>{
+      if(e.key!=='/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag=(e.target.tagName||'').toLowerCase();
+      if(tag==='input'||tag==='textarea'||tag==='select'||e.target.isContentEditable) return;
+      if(document.querySelector('.modal.open')) return;
+      e.preventDefault();
+      document.getElementById('web-portfolio')?.scrollIntoView({behavior:reduceMotion?'auto':'smooth'});
+      setTimeout(()=>inp?.focus({preventScroll:true}),350);
+    });
+
+    // Contadores animados al entrar en pantalla
+    const statsEl=document.querySelector('.pf-stats');
+    if(statsEl){
+      const done=()=>{
+        countUp($('pf-stat-sites'),livePortfolio.length);
+        countUp($('pf-stat-cats'),new Set(livePortfolio.map(s=>s.category)).size);
+        countUp($('pf-stat-favs'),favCount());
+      };
+      const io=new IntersectionObserver((en,o)=>{ if(en[0].isIntersecting){ done(); o.disconnect(); } },{threshold:.3});
+      io.observe(statsEl);
+    }
+  };
+
+  // ── Vista previa: navegación, dispositivos, recarga ──
+  let pfCurrent=0;
+  function startLoad(){
+    const b=$('pf-loadbar'); if(!b) return;
+    b.classList.remove('loading','done'); void b.offsetWidth; b.classList.add('loading');
+  }
+  function setDevice(d){
+    const w=document.querySelector('.live-pf-iframe-wrap'); if(!w) return;
+    w.classList.remove('dev-tablet','dev-mobile');
+    if(d==='tablet') w.classList.add('dev-tablet');
+    if(d==='mobile') w.classList.add('dev-mobile');
+    document.querySelectorAll('.pf-mb-btn[data-device]').forEach(b=>b.classList.toggle('active',b.dataset.device===d));
+  }
+  window.pfSetDevice=setDevice;
+
+  const _openOriginal=window.openLivePortfolioModal;
+  window.openLivePortfolioModal=function(i){
+    const wasOpen=$('live-pf-modal')?.classList.contains('open');
+    pfCurrent=i;
+    _openOriginal(i);
+    if(!wasOpen) setDevice('desktop');
+    const c=$('pf-mb-counter'); if(c) c.textContent=(i+1)+' / '+livePortfolio.length;
+    startLoad();
+  };
+  window.pfNav=function(dir){
+    const n=livePortfolio.length;
+    window.openLivePortfolioModal((pfCurrent+dir+n)%n);
+  };
+  window.pfReload=function(){
+    const s=livePortfolio[pfCurrent]; if(!s) return;
+    const ifr=$('live-pf-iframe'), fb=$('live-pf-fallback');
+    fb.classList.remove('show'); startLoad();
+    ifr.src='about:blank';
+    setTimeout(()=>{
+      ifr.src=s.url;
+      clearTimeout(window._pfFallbackTimer);
+      window._pfFallbackTimer=setTimeout(()=>fb.classList.add('show'),5000);
+    },30);
+  };
+  window.pfCopyCurrent=function(){ window.copyPfLink(pfCurrent); };
+
+  $('live-pf-iframe')?.addEventListener('load',()=>{
+    if($('live-pf-iframe').getAttribute('src')==='about:blank') return;
+    const b=$('pf-loadbar'); if(b){ b.classList.remove('loading'); b.classList.add('done'); }
+  });
+  $('pf-hide-fallback')?.addEventListener('click',()=>{
+    clearTimeout(window._pfFallbackTimer);
+    $('live-pf-fallback').classList.remove('show');
+  });
+  document.addEventListener('keydown',e=>{
+    if(!$('live-pf-modal')?.classList.contains('open')) return;
+    if(e.key==='ArrowRight') window.pfNav(1);
+    else if(e.key==='ArrowLeft') window.pfNav(-1);
+  });
+
+  // ── Botón lateral: subir al inicio ──
+  const st=$('scroll-top');
+  if(st){
+    const prog=st.querySelector('.st-prog'), C=132;
+    let ticking=false;
+    const update=()=>{
+      const y=window.scrollY||document.documentElement.scrollTop||0;
+      const max=document.documentElement.scrollHeight-window.innerHeight;
+      const p=max>0?Math.min(1,y/max):0;
+      prog.style.strokeDashoffset=C-C*p;
+      st.classList.toggle('show',y>400);
+      ticking=false;
+    };
+    window.addEventListener('scroll',()=>{ if(!ticking){ ticking=true; requestAnimationFrame(update); } },{passive:true});
+    window.addEventListener('resize',update);
+    st.addEventListener('click',()=>{
+      window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});
+      st.blur();
+    });
+    update();
+  }
+})();
+
+// ─── CONTENIDO DE MODALES ───
 const modals = {
   software:`
     <h2>💻 Custom Software Development</h2>
@@ -955,7 +2066,7 @@ const modals = {
       <tr><td>Base de Datos</td><td>PostgreSQL / MongoDB</td><td><span class="badge green">Producción</span></td></tr>
       <tr><td>Cloud</td><td>AWS / Azure</td><td><span class="badge green">Alta Disponibilidad</span></td></tr>
     </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a><button class="btn-outline" onclick="closeModal();openChat()">💬 Preguntar a IA</button></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Custom Software')">💳 Pagar Anticipo</button><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a></div>
     ${relatedHTML(['ai','cloud','helpdesk'])}
   `,
   web:`
@@ -975,7 +2086,7 @@ const modals = {
       <tr><td>E-commerce</td><td>6-10 semanas</td><td><span class="badge green">Retail</span></td></tr>
       <tr><td>Web App a Medida</td><td>8-16 semanas</td><td><span class="badge green">SaaS</span></td></tr>
     </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar mi sitio</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Web Development')">💳 Pagar Servicio Web</button><a href="sms:+13853949996" class="btn-primary">📲 Cotizar mi sitio</a></div>
     ${relatedHTML(['pos','cybersecurity','cloud'])}
   `,
   pos:`
@@ -988,12 +2099,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">💳</span><h4>Pagos Integrados</h4><p>Tarjeta, QR, pagos móviles (Apple Pay, Google Pay) y BNPL desde una sola terminal.</p></div>
       <div class="m-feat"><span class="mf-icon">📦</span><h4>Inventario Inteligente</h4><p>Control de stock con alertas de reabasto, gestión de proveedores y código de barras/QR.</p></div>
     </div>
-    <h4 style="color:var(--neon);margin:25px 0 15px;font-family:'Syne',sans-serif">Industrias que atendemos</h4>
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🍕</span><h4>Restaurantes & Food</h4><p>Gestión de mesas, comandas digitales, cocina en pantalla y propinas integradas.</p></div>
-      <div class="m-feat"><span class="mf-icon">👕</span><h4>Retail & Boutique</h4><p>Tallas, colores, variantes y programas de lealtad para tiendas físicas y online.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Demo Gratuita</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('POS System')">💳 Comprar / Suscribir POS</button></div>
     ${relatedHTML(['hw_enterprise','web','helpdesk'])}
   `,
   mobile:`
@@ -1006,7 +2112,7 @@ const modals = {
       <div class="m-feat"><span class="mf-icon">⚛️</span><h4>React Native</h4><p>Una base de código para ambas plataformas. Ideal para reducir costos sin sacrificar calidad.</p></div>
       <div class="m-feat"><span class="mf-icon">🔔</span><h4>Push & Engagement</h4><p>Notificaciones inteligentes, deep linking, analytics de comportamiento y onboarding optimizado.</p></div>
     </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Cotizar App</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Mobile App')">💳 Pagar Anticipo App</button></div>
     ${relatedHTML(['ai','cloud','cybersecurity'])}
   `,
   ai:`
@@ -1016,8 +2122,6 @@ const modals = {
     <div class="m-grid">
       <div class="m-feat"><span class="mf-icon">💬</span><h4>Chatbots & Agentes</h4><p>Asistentes IA entrenados en tu base de conocimiento para atención al cliente 24/7 sin costo operativo.</p></div>
       <div class="m-feat"><span class="mf-icon">👁️</span><h4>Visión por Computadora</h4><p>Control de calidad automatizado, reconocimiento de documentos y análisis visual en tiempo real.</p></div>
-      <div class="m-feat"><span class="mf-icon">📄</span><h4>Procesamiento de Documentos</h4><p>Extracción automática de datos de facturas, contratos y formularios con 99%+ de precisión.</p></div>
-      <div class="m-feat"><span class="mf-icon">📊</span><h4>Analítica Predictiva</h4><p>Modelos de ML que predicen demanda, detectan fraude y optimizan tu supply chain.</p></div>
     </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi caso</a></div>
     ${relatedHTML(['software','cloud','helpdesk'])}
@@ -1026,12 +2130,6 @@ const modals = {
     <h2>☁️ Cloud & DevOps</h2>
     <p class="m-sub">Infraestructura moderna que escala contigo. Pipelines automatizados para entregar software más rápido y con mayor confiabilidad.</p>
     <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Cloud" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🐳</span><h4>Contenedores & K8s</h4><p>Microservicios en Docker y orquestación con Kubernetes para máxima escalabilidad y resiliencia.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔄</span><h4>CI/CD Pipelines</h4><p>GitHub Actions, GitLab CI y ArgoCD para despliegues automáticos, seguros y reversibles.</p></div>
-      <div class="m-feat"><span class="mf-icon">📡</span><h4>Monitoreo 24/7</h4><p>Grafana, Prometheus y alertas proactivas para detectar problemas antes que tus usuarios.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔒</span><h4>IaC & Seguridad</h4><p>Terraform, Vault y políticas de seguridad como código para infraestructura reproducible y auditada.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Consultar</a></div>
     ${relatedHTML(['cybersecurity','hw_enterprise','helpdesk'])}
   `,
@@ -1039,18 +2137,6 @@ const modals = {
     <h2>🛡️ Ciberseguridad Digital</h2>
     <p class="m-sub">La mejor tecnología no sirve de nada sin protección. Auditamos, blindamos y monitoreamos tu software y datos contra amenazas reales, 24/7.</p>
     <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Ciberseguridad Digital" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🕵️</span><h4>Pentesting & Auditorías</h4><p>Simulamos ataques reales a tus sistemas para encontrar vulnerabilidades antes que los hackers.</p></div>
-      <div class="m-feat"><span class="mf-icon">🧠</span><h4>SOC 24/7</h4><p>Centro de operaciones de seguridad con monitoreo continuo, detección y respuesta a incidentes en tiempo real.</p></div>
-      <div class="m-feat"><span class="mf-icon">📋</span><h4>Cumplimiento Normativo</h4><p>Te ayudamos a cumplir con HIPAA, PCI-DSS, SOC 2 y otras regulaciones según tu industria.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔐</span><h4>Cifrado & Gestión de Accesos</h4><p>Cifrado extremo a extremo, autenticación multifactor y políticas de mínimo privilegio.</p></div>
-    </div>
-    <table class="m-table">
-      <tr><th>Servicio</th><th>Frecuencia</th><th>Nivel</th></tr>
-      <tr><td>Escaneo de Vulnerabilidades</td><td>Semanal</td><td><span class="badge green">Incluido</span></td></tr>
-      <tr><td>Pentesting Completo</td><td>Trimestral</td><td><span class="badge blue">Recomendado</span></td></tr>
-      <tr><td>Respuesta a Incidentes</td><td>24/7</td><td><span class="badge green">Prioritario</span></td></tr>
-    </table>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi negocio</a></div>
     ${relatedHTML(['hw_security','software','helpdesk'])}
   `,
@@ -1058,58 +2144,27 @@ const modals = {
     <h2>🎧 Soporte & Helpdesk</h2>
     <p class="m-sub">Un equipo técnico disponible cuando lo necesitas, para que tú te enfoques en tu negocio y nosotros en que la tecnología nunca te detenga.</p>
     <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Soporte Helpdesk" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">⏱️</span><h4>SLA Garantizado</h4><p>Tiempos de respuesta desde 15 minutos para incidencias críticas, con escalamiento automático.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>Soporte Remoto</h4><p>Acceso remoto seguro a equipos y servidores para resolver problemas sin esperar visitas presenciales.</p></div>
-      <div class="m-feat"><span class="mf-icon">📚</span><h4>Base de Conocimiento</h4><p>Documentación y tickets centralizados para que tu equipo aprenda a resolver lo básico por sí mismo.</p></div>
-      <div class="m-feat"><span class="mf-icon">📈</span><h4>Reportes Mensuales</h4><p>Métricas claras de incidencias resueltas, tiempos de respuesta y salud general de tu infraestructura.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Ver Planes de Soporte</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Soporte Tecnico')">💳 Pagar Plan de Soporte</button></div>
     ${relatedHTML(['cybersecurity','hw_enterprise','software'])}
   `,
   hw_enterprise:`
     <h2>🏢 Equipos para Empresa</h2>
     <p class="m-sub">Infraestructura crítica configurada y lista para producción. Proveemos, instalamos y mantenemos hardware de grado empresarial en Utah.</p>
     <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Enterprise" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>Servidores</h4><p>Dell PowerEdge, HP ProLiant configurados para virtualización VMware/Proxmox, base de datos o aplicaciones.</p></div>
-      <div class="m-feat"><span class="mf-icon">💼</span><h4>Workstations</h4><p>Para arquitectos, ingenieros, diseñadores 3D y analistas de datos. RTX 4090, Xeon y 128GB+ RAM.</p></div>
-      <div class="m-feat"><span class="mf-icon">💿</span><h4>NAS & Backups</h4><p>Synology y QNAP para almacenamiento masivo, respaldos automáticos y replicación offsite.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔌</span><h4>UPS & Energía</h4><p>Sistemas de alimentación ininterrumpida APC y Eaton para proteger equipos críticos.</p></div>
-    </div>
-    <table class="m-table">
-      <tr><th>Marca</th><th>Categoría</th><th>Stock</th></tr>
-      <tr><td>Dell EMC</td><td>Servidores & Storage</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>HP Enterprise</td><td>Servidores & Switches</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>Synology</td><td>NAS & Backup</td><td><span class="badge green">Disponible</span></td></tr>
-      <tr><td>Cisco</td><td>Networking Enterprise</td><td><span class="badge blue">Por pedido</span></td></tr>
-    </table>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Solicitar Cotización</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Hardware / Equipos')">💳 Pagar Factura Hardware</button></div>
     ${relatedHTML(['hw_networking','hw_security','cloud'])}
   `,
   hw_home:`
     <h2>🏠 Equipos para Casa & Home Office</h2>
     <p class="m-sub">Tecnología premium para tu productividad y entretenimiento. Configuraciones equilibradas y potentes a tu medida.</p>
     <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Home PC" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">💻</span><h4>Laptops de Alta Gama</h4><p>MacBook Pro, Dell XPS, ASUS ROG Zephyrus. Selección y configuración personalizada según tu uso.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖥️</span><h4>PC Desktop a Medida</h4><p>Ensamblamos PCs optimizados para gaming, edición de video 4K, modelado 3D u ofimática avanzada.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖱️</span><h4>Periféricos Premium</h4><p>Monitores 4K/144Hz, teclados mecánicos, sillas ergonómicas y audio profesional para tu setup.</p></div>
-      <div class="m-feat"><span class="mf-icon">🎮</span><h4>Gaming Rigs</h4><p>Builds enteras con gestión de cables, RGB sincronizado y refrigeración líquida custom.</p></div>
-    </div>
-    <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Armar mi PC</a></div>
+    <div class="m-cta-row"><button class="btn-pay" onclick="closeModal();openPaymentModal('Hardware / Equipos')">💳 Pagar PC / Equipo</button></div>
     ${relatedHTML(['hw_networking','hw_av','helpdesk'])}
   `,
   hw_networking:`
     <h2>🌐 Redes & Conectividad Profesional</h2>
     <p class="m-sub">La columna vertebral de cualquier entorno digital. Diseñamos, instalamos y mantenemos redes rápidas, seguras y estables.</p>
     <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Networking" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📡</span><h4>WiFi 7 Mesh</h4><p>Cobertura total sin puntos ciegos para empresas y residencias grandes. Ubiquiti UniFi y Cisco Meraki.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔌</span><h4>Cableado Estructurado</h4><p>Cat6A y fibra óptica certificados para velocidades de hasta 10Gbps en toda la instalación.</p></div>
-      <div class="m-feat"><span class="mf-icon">🛡️</span><h4>Firewalls Empresariales</h4><p>Fortinet, pfSense y Ubiquiti para segmentación de red, IPS/IDS y VPN site-to-site.</p></div>
-      <div class="m-feat"><span class="mf-icon">📊</span><h4>Monitoreo de Red</h4><p>PRTG, Zabbix y dashboards personalizados para visibilidad total del tráfico y alertas proactivas.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Evaluar mi red</a></div>
     ${relatedHTML(['hw_security','hw_av','cybersecurity'])}
   `,
@@ -1117,12 +2172,6 @@ const modals = {
     <h2>🔒 Ciberseguridad & Vigilancia</h2>
     <p class="m-sub">Protección integral física y digital. Desde sistemas de videovigilancia IP hasta seguridad perimetral de red empresarial.</p>
     <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Security" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📹</span><h4>CCTV IP & NVR</h4><p>Cámaras 4K con visión nocturna, reconocimiento de personas y acceso remoto desde tu celular.</p></div>
-      <div class="m-feat"><span class="mf-icon">🚪</span><h4>Control de Acceso</h4><p>Lectores biométricos, tarjetas RFID y cerraduras electrónicas con registro de entradas/salidas.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔐</span><h4>VPN Empresarial</h4><p>Acceso remoto seguro para empleados remotos con autenticación multifactor y cifrado AES-256.</p></div>
-      <div class="m-feat"><span class="mf-icon">🛡️</span><h4>Endpoint Security</h4><p>Antivirus empresarial, EDR y gestión centralizada de dispositivos con respuesta automática a amenazas.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Auditar mi seguridad</a></div>
     ${relatedHTML(['cybersecurity','hw_networking','hw_av'])}
   `,
@@ -1130,12 +2179,6 @@ const modals = {
     <h2>🖥️ Audio/Video & Salas de Juntas</h2>
     <p class="m-sub">Convierte cualquier sala en un espacio de colaboración de nivel mundial. Videoconferencia nítida, audio profesional y control con un solo toque.</p>
     <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1000&q=80" class="m-img" alt="Sala de juntas inteligente" loading="lazy">
-    <div class="m-grid">
-      <div class="m-feat"><span class="mf-icon">📹</span><h4>Videoconferencia 4K</h4><p>Cámaras con seguimiento automático y cancelación de ruido para reuniones híbridas sin fricciones.</p></div>
-      <div class="m-feat"><span class="mf-icon">🖱️</span><h4>Pantallas Táctiles Interactivas</h4><p>Pizarras digitales para colaboración en tiempo real entre equipos remotos y presenciales.</p></div>
-      <div class="m-feat"><span class="mf-icon">🔊</span><h4>Audio Profesional</h4><p>Micrófonos de techo y parlantes calibrados para que cada palabra se escuche con claridad.</p></div>
-      <div class="m-feat"><span class="mf-icon">📲</span><h4>Control Unificado</h4><p>Integración con Zoom, Teams y Google Meet, controlado desde una sola tablet en la sala.</p></div>
-    </div>
     <div class="m-cta-row"><a href="sms:+13853949996" class="btn-primary">📲 Equipar mi sala</a></div>
     ${relatedHTML(['hw_networking','hw_enterprise','helpdesk'])}
   `
@@ -1152,7 +2195,7 @@ function closeModal(){
 }
 function handleModalClick(e){if(e.target===document.getElementById('modal'))closeModal()}
 
-// ─── MENU ───
+// ─── MENÚ NAVEGACIÓN ───
 function toggleMenu(){
   const menu = document.getElementById('mobile-menu');
   const btn = document.querySelector('.hamburger');
@@ -1162,7 +2205,7 @@ function toggleMenu(){
   if(btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
-// ─── CHAT ───
+// ─── CHATBOT ───
 let chatOpen = false;
 function openChat(){document.getElementById('chat-box').style.display='flex';chatOpen=true;document.getElementById('chat-input').focus();}
 function closeChat(){document.getElementById('chat-box').style.display='none';chatOpen=false;}
@@ -1185,7 +2228,7 @@ async function sendMsg(){
     });
     if(!res.ok) throw new Error('backend error');
     const data = await res.json();
-    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos al (385) 394-9996.';
+    const reply = data.reply || 'Lo siento, hubo un error. Contáctanos directamente al +1 (385) 394-9996.';
     typing.remove();
     addBubble(reply,'bot');
     saveHistory(txt, reply);
@@ -1212,7 +2255,10 @@ function addBubble(text, cls){
   return d;
 }
 
-// ─── SCROLL ANIMATIONS ───
+// ─── INICIALIZAR PORTAFOLIO WEB ───
+renderLivePortfolio();
+
+// ─── ANIMACIONES AL SCROLLEAR ───
 const obs = new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
 },{threshold:.12});
