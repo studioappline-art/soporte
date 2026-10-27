@@ -35,6 +35,7 @@ body{
   color:var(--text);
   overflow-x:hidden;
   line-height:1.65;
+  isolation:isolate; /* keeps the animated canvas visible above the page background */
 }
 
 /* ─── SCROLLBAR ─── */
@@ -945,7 +946,7 @@ footer p{color:var(--sub);font-size:.85rem}
 .fade-in{opacity:0;transform:translateY(25px);transition:.8s ease}
 .fade-in.visible{opacity:1;transform:translateY(0)}
 @media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  html{scroll-behavior:auto}
 }
 
 /* ═══ TECH FX v6: background, cursor, tilt, chat chips ═══ */
@@ -953,15 +954,14 @@ footer p{color:var(--sub);font-size:.85rem}
 .fx-cursor-on, .fx-cursor-on *{cursor:none!important}
 #fx-dot,#fx-ring,.fx-trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;will-change:transform;opacity:0}
 .fx-ready #fx-dot,.fx-ready #fx-ring{opacity:1}
-#fx-dot{width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--fx-c,#4fc3ff);box-shadow:0 0 14px var(--fx-c,#4fc3ff),0 0 30px var(--fx-c,#4fc3ff);transition:width .2s,height .2s,margin .2s,background .3s}
-#fx-ring{width:38px;height:38px;margin:-19px 0 0 -19px;border:1.5px solid var(--fx-c,#4fc3ff);border-radius:50%;transition:width .25s,height .25s,margin .25s,border-color .3s,background .25s,border-radius .25s;display:grid;place-items:center}
-#fx-ring::before,#fx-ring::after{content:"";position:absolute;background:var(--fx-c,#4fc3ff);opacity:.7;transition:.25s}
-#fx-ring::before{width:8px;height:1.5px;left:-12px;box-shadow:0 0 0 0 transparent}
-#fx-ring::after{width:8px;height:1.5px;right:-12px}
-#fx-ring.hover{width:64px;height:64px;margin:-32px 0 0 -32px;background:rgba(79,195,255,.08);border-radius:18px}
-#fx-ring.down{width:26px;height:26px;margin:-13px 0 0 -13px;background:rgba(79,195,255,.2)}
-#fx-ring.text{width:3px;height:30px;margin:-15px 0 0 -1px;border-radius:2px;background:var(--fx-c,#4fc3ff)}
-#fx-dot.hover{width:6px;height:6px;margin:-3px 0 0 -3px}
+#fx-dot{display:none!important}
+#fx-ring{width:56px;height:63px;overflow:visible;transform-origin:95% 4.2%;filter:drop-shadow(0 0 4px var(--fx-c,#00ff88)) drop-shadow(0 0 13px var(--fx-c,#00ff88));transition:filter .2s ease;}
+.fx-cursor-shape{fill:rgba(5,12,31,.94);stroke:var(--fx-c,#00ff88);stroke-width:2;stroke-linejoin:round;transition:fill .2s ease,stroke-width .2s ease;}
+#fx-ring.hover{filter:drop-shadow(0 0 6px var(--fx-c,#00ff88)) drop-shadow(0 0 20px var(--fx-c,#00ff88));}
+#fx-ring.hover .fx-cursor-shape{stroke-width:2.8;fill:rgba(0,255,136,.12)}
+#fx-ring.down{filter:drop-shadow(0 0 8px var(--fx-c,#00ff88)) drop-shadow(0 0 24px var(--fx-c,#00ff88));}
+#fx-ring.down .fx-cursor-shape{fill:rgba(0,255,136,.22)}
+#fx-ring.text{filter:drop-shadow(0 0 6px var(--fx-c,#00ff88));}
 .fx-trail{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--fx-c,#4fc3ff);opacity:.35}
 .fx-ripple{position:fixed;pointer-events:none;z-index:9998;border:2px solid var(--fx-c,#4fc3ff);border-radius:50%;width:12px;height:12px;margin:-6px 0 0 -6px;animation:fxRip .7s ease-out forwards}
 @keyframes fxRip{to{transform:scale(7);opacity:0}}
@@ -973,7 +973,7 @@ footer p{color:var(--sub);font-size:.85rem}
 .fx-scan{position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:0;z-index:3}
 .fx-tilt:hover > .fx-scan{opacity:.8;animation:fxScan 1.6s linear infinite}
 @keyframes fxScan{from{top:0}to{top:100%}}
-.modal.open .modal-inner{animation:fxModalIn .55s cubic-bezier(.2,1,.3,1)}
+.modal.open .modal-inner,.live-pf-modal.open .modal-inner{animation:fxModalIn .55s cubic-bezier(.2,1,.3,1)}
 @keyframes fxModalIn{0%{opacity:0;transform:perspective(900px) rotateX(14deg) translateY(40px) scale(.92);filter:blur(6px)}100%{opacity:1;transform:none;filter:none}}
 .modal.open .modal-inner::before{content:"";position:absolute;left:30px;right:30px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon),var(--accent),transparent);animation:fxBeam 2.4s ease-in-out infinite}
 @keyframes fxBeam{0%,100%{opacity:.3}50%{opacity:1}}
@@ -990,20 +990,23 @@ footer p{color:var(--sub);font-size:.85rem}
 .feat-item:hover .feat-icon{animation:fxBob .8s ease-in-out infinite}
 @keyframes fxBob{50%{transform:translateY(-6px) scale(1.12)}}
 .fx-type-caret::after{content:"▍";color:var(--neon);animation:blink 1s steps(2) infinite;margin-left:2px}
-#chat-chips{display:flex;flex-wrap:nowrap;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}#chat-chips::-webkit-scrollbar{display:none}
+#chat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px;max-height:94px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--deep) transparent}#chat-chips::-webkit-scrollbar{width:4px}#chat-chips::-webkit-scrollbar-thumb{background:var(--deep);border-radius:4px}
 .chat-chip{white-space:nowrap;flex:0 0 auto;border:1px solid var(--border);background:rgba(79,195,255,.06);color:var(--neon);font:inherit;font-size:.75rem;font-weight:600;padding:6px 12px;border-radius:50px;cursor:pointer;transition:.25s}
 .chat-chip:hover{background:rgba(79,195,255,.18);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,114,255,.25)}
 .m-msg.bot .m-act{display:inline-block;margin:6px 6px 0 0;padding:5px 12px;border-radius:50px;border:1px solid rgba(79,195,255,.35);background:rgba(79,195,255,.08);color:var(--neon);font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;text-decoration:none;transition:.25s}
 .m-msg.bot .m-act:hover{background:rgba(79,195,255,.22)}
 .m-msg{animation:fxMsg .35s cubic-bezier(.2,1,.3,1)}
 @keyframes fxMsg{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-@media (hover:none) and (pointer:coarse){#fx-dot,#fx-ring,.fx-trail{display:none!important}.fx-tilt:hover{box-shadow:none}}
-@media (prefers-reduced-motion: reduce){#fx-dot,#fx-ring,.fx-trail,.fx-ripple{display:none!important}.fx-tilt{transform:none!important}}
+@media (hover:none) and (pointer:coarse){#fx-ring{width:46px;height:52px}.fx-tilt:hover{box-shadow:none}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
 <canvas id="bg-code" aria-hidden="true"></canvas>
-<div id="fx-dot" aria-hidden="true"></div><div id="fx-ring" aria-hidden="true"></div>
+<div id="fx-dot" aria-hidden="true"></div>
+<svg id="fx-ring" aria-hidden="true" viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
+  <path class="fx-cursor-shape" d="M4 3 54 25.5Q61 28.5 55 33L45 39 58 54.5Q61 58 57 62L53 66Q49 69 45.5 64L31.5 48 23 61Q19.5 66 16 60Z"/>
+</svg>
 <div id="top"></div>
 
 <!-- NAV -->
@@ -1176,7 +1179,7 @@ footer p{color:var(--sub);font-size:.85rem}
         <div class="t-info">
           <h4>Eng. Marco Torres</h4>
           <p>Founder &amp; Owner</p>
-          <small>Founder of Appline Studio LLC. Software, hardware and networking solutions in Utah and Latin America.</small>
+          <small>Founder of Appline Studio. Software, hardware and networking solutions in Utah and Latin America.</small>
           <div class="t-skills"><span class="skill-tag">Software</span><span class="skill-tag">Hardware</span><span class="skill-tag">Networks</span></div>
         </div>
       </div>
@@ -1432,7 +1435,7 @@ footer p{color:var(--sub);font-size:.85rem}
       <a href="javascript:void(0)" onclick="openPaymentModal()" style="color:var(--green)">Pay online</a>
       <a href="sms:+13853949996">+1 (385) 394-9996</a>
     </div>
-    <div class="footer-bottom">© 2026 Appline Studio LLC · Utah, USA · All rights reserved</div>
+    <div class="footer-bottom">© 2026 Appline Studio · Utah, USA · All rights reserved</div>
   </div>
 </footer>
 
@@ -1585,7 +1588,7 @@ footer p{color:var(--sub);font-size:.85rem}
 <script>
 // ─── I18N: English by default, Spanish on demand ───
 const I18N_ES = {
-"Founder of Appline Studio LLC. Software, hardware and networking solutions in Utah and Latin America.": "Fundador de Appline Studio LLC. Soluciones de software, hardware y redes en Utah y Latinoamérica.",
+"Founder of Appline Studio. Software, hardware and networking solutions in Utah and Latin America.": "Fundador de Appline Studio. Soluciones de software, hardware y redes en Utah y Latinoamérica.",
 "Networks": "Redes",
 "Preview not loading? Some sites block embedded views. Use the button to open the full site.": "¿No carga la vista previa? Algunos sitios bloquean las vistas embebidas. Usa el botón para abrir el sitio completo.",
 "Appline Studio: custom software development, enterprise hardware, networking, cybersecurity and technical support in Utah, USA.": "Appline Studio: desarrollo de software a medida, hardware empresarial, redes, ciberseguridad y soporte técnico en Utah, USA.",
@@ -1712,7 +1715,7 @@ const I18N_ES = {
 "Try another word or reset the filters.": "Prueba con otra palabra o restablece los filtros.",
 "Reset filters": "Restablecer filtros",
 "Pay online": "Pagar en línea",
-"© 2026 Appline Studio LLC · Utah, USA · All rights reserved": "© 2026 Appline Studio LLC · Utah, USA · Todos los derechos reservados",
+"© 2026 Appline Studio · Utah, USA · All rights reserved": "© 2026 Appline Studio · Utah, USA · Todos los derechos reservados",
 "Close preview": "Cerrar vista previa",
 "Site preview": "Vista previa del sitio",
 "Previous project": "Proyecto anterior",
@@ -1898,8 +1901,8 @@ const I18N_ES = {
 "▸ Leadership": "▸ Liderazgo",
 "Meet the Founder": "Conoce al Fundador",
 "Eng. Marco Torres": "Ing. Marco Torres",
-"Founder & Owner · Appline Studio LLC": "Fundador y Propietario · Appline Studio LLC",
-"Marco founded Appline Studio LLC, an IT studio based in Vineyard, Utah. The studio builds custom software, supplies and configures business hardware, designs networks and provides technical support — in person across Utah and remotely for clients in Mexico and Latin America.": "Marco fundó Appline Studio LLC, un estudio de TI con sede en Vineyard, Utah. El estudio desarrolla software a medida, suministra y configura hardware empresarial, diseña redes y brinda soporte técnico, de forma presencial en Utah y de forma remota para clientes en México y Latinoamérica.",
+"Founder & Owner · Appline Studio": "Fundador y Propietario · Appline Studio",
+"Marco founded Appline Studio, an IT studio based in Vineyard, Utah. The studio builds custom software, supplies and configures business hardware, designs networks and provides technical support — in person across Utah and remotely for clients in Mexico and Latin America.": "Marco fundó Appline Studio, un estudio de TI con sede en Vineyard, Utah. El estudio desarrolla software a medida, suministra y configura hardware empresarial, diseña redes y brinda soporte técnico, de forma presencial en Utah y de forma remota para clientes en México y Latinoamérica.",
 "Every project starts the same way: a clear explanation of the problem and the cost before any work begins.": "Todo proyecto empieza igual: una explicación clara del problema y del costo antes de iniciar cualquier trabajo.",
 "🛠️ Software, hardware & networking": "🛠️ Software, hardware y redes",
 "📍 Vineyard, Utah — in person & remote": "📍 Vineyard, Utah — presencial y remoto",
@@ -2721,7 +2724,7 @@ async function sendMsg(){
   if(!txt) return;
   inp.value='';
   addBubble(brainEsc(txt),'user');
-  const typing = addBubble('Typing...','bot typing');
+  const typing = addBubble(LANG==='es'?'Analizando el sitio…':'Searching the site…','bot typing');
   let local = null;
   try { local = siteBrain(txt, LANG); } catch(err){ local = null; }
   if(local){
@@ -2779,8 +2782,8 @@ const BRAIN_KB = [
     en:"You're welcome! 😊 If you want a quote or a diagnosis, text us at "+BRAIN_PHONE+".",
     es:"¡Con gusto! 😊 Si quieres una cotización o un diagnóstico, escríbenos al "+BRAIN_PHONE+"." },
   { id:'about', k:['who are you','what is appline','about appline','about you','tell me about','company','studio','founded','since when','established','how long','quienes son','quien eres','que es appline','empresa','sobre ustedes','acerca','desde cuando','fundada','cuantos anos','anos de experiencia','experience','experiencia'],
-    en:"<strong>Appline Studio LLC</strong> is an IT studio in Utah (est. 2024) offering custom software, web, mobile, AI, cloud, cybersecurity, hardware, networking and repair. Our numbers: <strong>150+ projects</strong>, <strong>8+ years of experience</strong>, <strong>99% satisfaction</strong> and <strong>24/7 support</strong>.",
-    es:"<strong>Appline Studio LLC</strong> es un estudio de TI en Utah (est. 2024) que ofrece software a medida, web, apps móviles, IA, nube, ciberseguridad, hardware, redes y reparación. En cifras: <strong>150+ proyectos</strong>, <strong>8+ años de experiencia</strong>, <strong>99% de satisfacción</strong> y <strong>soporte 24/7</strong>.",
+    en:"<strong>Appline Studio</strong> is an IT studio in Utah (est. 2024) offering custom software, web, mobile, AI, cloud, cybersecurity, hardware, networking and repair. Our numbers: <strong>150+ projects</strong>, <strong>8+ years of experience</strong>, <strong>99% satisfaction</strong> and <strong>24/7 support</strong>.",
+    es:"<strong>Appline Studio</strong> es un estudio de TI en Utah (est. 2024) que ofrece software a medida, web, apps móviles, IA, nube, ciberseguridad, hardware, redes y reparación. En cifras: <strong>150+ proyectos</strong>, <strong>8+ años de experiencia</strong>, <strong>99% de satisfacción</strong> y <strong>soporte 24/7</strong>.",
     acts:[['#team','👥 Team','👥 Equipo']] },
   { id:'services', k:['services','what do you do','what do you offer','offer','solutions','everything','all services','servicios','que hacen','que ofrecen','que ofreces','soluciones','catalogo','todo lo que'],
     en:"We cover two worlds:<br>💻 <strong>Software</strong>: Custom Software (ERP/CRM), Web, POS, Mobile Apps, AI Automation, Cloud & DevOps, Cybersecurity, Helpdesk.<br>🔧 <strong>Hardware</strong>: Business & Home Equipment, Networking, Cybersecurity/CCTV, Audio/Video rooms, plus Deep Repair.<br>Ask me about any of them!",
@@ -2919,6 +2922,37 @@ function brainPortfolioAnswer(lang, q){
     : `We've published <strong>${livePortfolio.length} sites</strong> across <strong>${Object.keys(cats).length} categories</strong>:<br>${list}<br>Open any of them in the <em>Interactive Web Portfolio</em> (with search, filters and favorites). There are also success stories: Retail ERP, E-commerce, Delivery app, Data Center, 24/7 SOC and Computer Vision.`)
     + `<br><button class="m-act" onclick="brainGo('#web-portfolio')">🌐 ${lang==='es'?'Ir al portafolio':'Go to portfolio'}</button>`;
 }
+function brainSiteSearch(text, lang){
+  const stop = new Set(('the a an and or but for to of in on at with from is are was were do does did can could would should what which who where when how many much tell me show me explain please about es el la los las un una unos unas y o pero para por de del en con que cual quien donde cuando como cuantos cuantas cuesta hacen ofrecen sobre puedes dime muestra explica hay sitio pagina empresa servicios equipo tiene son esta estan').split(' '));
+  const clean = value => brainNorm(value).replace(/[^a-z0-9áéíóúüñ\s]/gi,' ').replace(/\s+/g,' ').trim();
+  const terms = [...new Set(clean(text).split(' ').filter(t=>t.length>2&&!stop.has(t)))];
+  if(!terms.length) return null;
+  const candidates=[];
+  document.querySelectorAll('h1,h2,h3,h4,p,li,.s-card,.feat-item,.hw-body,.repair-wrap,.team-card,.footer-col').forEach(el=>{
+    if(el.closest('#chat-box') || el.closest('script,style,nav')) return;
+    const raw=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
+    if(raw.length<45 || raw.length>850) return;
+    const section=el.closest('section,article,footer') || el.parentElement;
+    const title=section?.querySelector('h1,h2,h3')?.innerText?.trim() || '';
+    const id=section?.id || el.closest('[id]')?.id || '';
+    if(!id) return;
+    const hay=clean(title+' '+raw);
+    let score=0, hits=0;
+    terms.forEach(term=>{ if(hay.includes(term)){hits++;score+=1+Math.min(term.length,10)*.04;if(clean(title).includes(term))score+=.8;} });
+    const coverage=hits/terms.length;
+    score+=coverage*1.5;
+    if(hits>=1 && coverage>=.5 && score>=1.8) candidates.push({id,title:title||id,text:raw,score});
+  });
+  candidates.sort((a,b)=>b.score-a.score);
+  if(!candidates.length) return null;
+  const best=candidates[0], chosen=[best];
+  for(const c of candidates.slice(1)) if(c.id===best.id && c.text!==best.text && chosen.length<3) chosen.push(c);
+  const excerpts=chosen.map(c=>brainEsc(c.text.length>420?c.text.slice(0,417).trim()+'…':c.text));
+  const label=lang==='es'?'Encontré esto en el sitio':'I found this on the site';
+  const jump=lang==='es'?'Ver sección':'Open section';
+  return `🔎 <strong>${label} · ${brainEsc(best.title)}</strong><br>${excerpts.join('<br><br>')}<br><button class="m-act" onclick="brainGo('#${best.id.replace(/[^a-zA-Z0-9_-]/g,'')}')">↗ ${jump}</button>`;
+}
+
 function siteBrain(text, lang){
   const q = brainNorm(text);
   // direct hit on a portfolio project name
@@ -2939,7 +2973,7 @@ function siteBrain(text, lang){
   const followUp = /\b(more|details|detail|that|it|those|mas|detalles|eso|esa|ese|y el|y la)\b/.test(q) && q.trim().split(' ').length<=6;
   if(!best || bestScore<1){
     if(followUp && brainLast){ best = BRAIN_KB.find(e=>e.id===brainLast); }
-    if(!best) return null;
+    if(!best) return brainSiteSearch(text, lang);
   }
   // "price of X" style: keep topic but answer pricing, mentioning the topic
   brainLast = best.id;
@@ -2960,11 +2994,19 @@ function brainFallback(lang){
 }
 const BRAIN_CHIPS = [
   ['What services do you offer?','¿Qué servicios ofrecen?'],
+  ['What software can you build?','¿Qué software pueden desarrollar?'],
   ['How much does it cost?','¿Cuánto cuesta?'],
   ['Show me your websites','Muéstrame sus sitios web'],
   ['Who is on the team?','¿Quién está en el equipo?'],
   ['I need a repair','Necesito una reparación'],
-  ['How do I pay?','¿Cómo pago?']
+  ['How do I pay?','¿Cómo pago?'],
+  ['Where are you based?','¿Dónde están ubicados?'],
+  ['Do you work remotely?','¿Dan soporte remoto?'],
+  ['How do I start a project?','¿Cómo inicio un proyecto?'],
+  ['Do you offer 24/7 support?','¿Tienen soporte 24/7?'],
+  ['Can I speak to a person?','¿Puedo hablar con una persona?'],
+  ['Do you speak Spanish?','¿Hablan español?'],
+  ['What payment methods do you accept?','¿Qué métodos de pago aceptan?']
 ];
 function renderChatChips(){
   let box = document.getElementById('chat-chips');
@@ -3022,7 +3064,7 @@ function renderChatChips(){
     function drawGlyphs(){
       ctx.font='14px "Courier New",monospace';
       cols.forEach(c=>{
-        c.y += c.v*(reduce?0:1);
+        c.y += c.v;
         if(Math.random()<.08||!c.ch.length){ c.ch.unshift(GLYPHS[Math.floor(Math.random()*GLYPHS.length)]); if(c.ch.length>c.len) c.ch.pop(); }
         const [r,g,b]=hexToRgb(c.c);
         // pointer makes columns brighter nearby
@@ -3059,7 +3101,7 @@ function renderChatChips(){
       const maxD = W<700?110:150;
       for(let i=0;i<nodes.length;i++){
         const n=nodes[i];
-        if(!reduce){ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>W) n.vx*=-1; if(n.y<0||n.y>H) n.vy*=-1; }
+        n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>W) n.vx*=-1; if(n.y<0||n.y>H) n.vy*=-1;
         if(mouse.active){ const dx=n.x-mouse.x, dy=n.y-mouse.y, d=Math.hypot(dx,dy); if(d<140&&d>0){ n.x+=dx/d*1.2; n.y+=dy/d*1.2; } }
         for(let j=i+1;j<nodes.length;j++){
           const m=nodes[j], d=Math.hypot(n.x-m.x,n.y-m.y);
@@ -3082,24 +3124,25 @@ function renderChatChips(){
     resize();
     let rz; window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(resize,150);});
     document.addEventListener('visibilitychange',()=>{ running=!document.hidden; if(running) requestAnimationFrame(frame); });
-    if(reduce){ drawNet(); drawGlyphs(); drawBlocks(); } else requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
 
   window.addEventListener('pointermove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; mouse.active=true; },{passive:true});
   document.addEventListener('mouseleave',()=>{ mouse.active=false; });
 
   // ── 2) INTERACTIVE CURSOR ──
-  if(!coarse && !reduce){
+  if(window.PointerEvent){
     const dot=document.getElementById('fx-dot'), ring=document.getElementById('fx-ring');
     if(dot && ring){
       document.documentElement.classList.add('fx-cursor-on');
-      const trail=[]; for(let i=0;i<7;i++){ const t=document.createElement('div'); t.className='fx-trail'; t.style.opacity=0; document.body.appendChild(t); trail.push({el:t,x:0,y:0}); }
+      const trail=[]; for(let i=0;i<(coarse?3:7);i++){ const t=document.createElement('div'); t.className='fx-trail'; t.style.opacity=0; document.body.appendChild(t); trail.push({el:t,x:0,y:0}); }
       let rx=0,ry=0,dx=0,dy=0,hue=0,speed=0,px=0,py=0,started=false,magnet=null;
-      let colorIdx=0,colorT=0;
+      let colorT=0,touchHideTimer=null;
       function setColor(c){ document.documentElement.style.setProperty('--fx-c',c); }
       window.addEventListener('pointermove',e=>{
         dx=e.clientX; dy=e.clientY;
         if(!started){ started=true; rx=dx; ry=dy; document.documentElement.classList.add('fx-ready'); }
+        if(e.pointerType==='touch'){ ring.style.opacity='1'; clearTimeout(touchHideTimer); touchHideTimer=setTimeout(()=>{ring.style.opacity='0';},850); }
       },{passive:true});
       const INTER='a,button,.s-card,.t-card,.hw-card,.pf-item,.live-pf-card,.m-feat,select,label,summary,[onclick]';
       document.addEventListener('pointerover',e=>{
@@ -3111,9 +3154,10 @@ function renderChatChips(){
       });
       document.addEventListener('pointerdown',e=>{
         ring.classList.add('down');
+        if(e.pointerType==='touch'){ring.style.opacity='1';clearTimeout(touchHideTimer);}
         const r=document.createElement('div'); r.className='fx-ripple'; r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px'; document.body.appendChild(r); setTimeout(()=>r.remove(),700);
       });
-      document.addEventListener('pointerup',()=>ring.classList.remove('down'));
+      document.addEventListener('pointerup',e=>{ring.classList.remove('down');if(e.pointerType==='touch')touchHideTimer=setTimeout(()=>{ring.style.opacity='0';},500);});
       document.addEventListener('mouseleave',()=>{ dot.style.opacity=0; ring.style.opacity=0; });
       document.addEventListener('mouseenter',()=>{ dot.style.opacity=''; ring.style.opacity=''; });
       function loop(){
@@ -3121,15 +3165,18 @@ function renderChatChips(){
         let tx=dx, ty=dy;
         if(magnet){ const b=magnet.getBoundingClientRect(); const cx=b.left+b.width/2, cy=b.top+b.height/2; tx=dx+(cx-dx)*.25; ty=dy+(cy-dy)*.25; }
         rx+=(tx-rx)*.16; ry+=(ty-ry)*.16;
+        const tipX=ring.clientWidth*.95,tipY=ring.clientHeight*.042;
+        ring.style.transformOrigin=`${tipX}px ${tipY}px`;
         speed=Math.hypot(dx-px,dy-py); px=dx; py=dy;
         // color cycles through brand palette, faster when moving
         colorT += .004 + Math.min(speed,40)*.0016;
         const a=Math.floor(colorT)%PALETTE.length, b2=(a+1)%PALETTE.length, f=colorT%1;
         const A=hexToRgb(PALETTE[a]), B=hexToRgb(PALETTE[b2]);
-        setColor(`rgb(${Math.round(A[0]+(B[0]-A[0])*f)},${Math.round(A[1]+(B[1]-A[1])*f)},${Math.round(A[2]+(B[2]-A[2])*f)})`);
+        setColor('#00ff88');
         const rot = Math.atan2(dy-ry,dx-rx)*180/Math.PI;
         dot.style.transform=`translate(${dx}px,${dy}px)`;
-        ring.style.transform=`translate(${rx}px,${ry}px) rotate(${ring.classList.contains('hover')||ring.classList.contains('text')?0:rot}deg) scale(${1+Math.min(speed,30)/90})`;
+        const scale=ring.classList.contains('down')?.9:(ring.classList.contains('hover')?1.08:1+Math.min(speed,30)/90);
+        ring.style.transform=`translate(${rx-tipX}px,${ry-tipY}px) scale(${scale})`;
         let lx=rx,ly=ry;
         trail.forEach((t,i)=>{ t.x+=(lx-t.x)*(.34-i*.03); t.y+=(ly-t.y)*(.34-i*.03); t.el.style.transform=`translate(${t.x}px,${t.y}px) scale(${1-i*.12})`; t.el.style.opacity=started?Math.max(0,.4-i*.055)*Math.min(1,speed/6):0; lx=t.x; ly=t.y; });
       }
@@ -3139,7 +3186,7 @@ function renderChatChips(){
 
   // ── 3) CARDS: 3D tilt + glare + scan line ──
   function tiltify(root){
-    if(coarse||reduce) return;
+    if(coarse) return;
     root.querySelectorAll('.s-card,.t-card,.hw-card,.pf-item,.live-pf-card,.repair-wrap').forEach(el=>{
       if(el.dataset.fx) return; el.dataset.fx=1;
       el.classList.add('fx-tilt');
@@ -3162,7 +3209,7 @@ function renderChatChips(){
 
   // ── 4) Subtle parallax on hero glow following the pointer ──
   const heroBg=document.querySelector('.hero-bg');
-  if(heroBg && !coarse && !reduce){
+  if(heroBg && !coarse){
     window.addEventListener('pointermove',e=>{
       const x=(e.clientX/window.innerWidth-.5)*24, y=(e.clientY/window.innerHeight-.5)*24;
       heroBg.style.transform=`translate(${x}px,${y}px) scale(1.06)`;
