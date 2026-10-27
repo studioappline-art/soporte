@@ -392,6 +392,7 @@ section{padding:100px 0}
   display:flex;align-items:center;justify-content:center;transition:.3s;
 }
 .modal-close:hover{background:rgba(79,195,255,.15);transform:rotate(90deg)}
+.modal-close,.chat-close-btn,.close-menu{min-width:48px;min-height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* ESTILOS FORMULARIO DE PAGO */
 .pay-form-group {
@@ -956,7 +957,7 @@ footer p{color:var(--sub);font-size:.85rem}
 #fx-dot,#fx-ring,.fx-trail{position:fixed;left:0;top:0;pointer-events:none;z-index:9999;will-change:transform;opacity:0}
 .fx-ready #fx-dot,.fx-ready #fx-ring{opacity:1}
 #fx-dot{display:none!important}
-#fx-ring{width:34px;height:38px;overflow:visible;pointer-events:none;transform-origin:93.75% 37.5%;filter:drop-shadow(0 0 4px var(--fx-c,#00ff88)) drop-shadow(0 0 13px var(--fx-c,#00ff88));transition:filter .2s ease;}
+#fx-ring{width:28px;height:31.5px;overflow:visible;pointer-events:none;transform-origin:93.75% 37.5%;filter:drop-shadow(0 0 4px var(--fx-c,#00ff88)) drop-shadow(0 0 13px var(--fx-c,#00ff88));transition:filter .2s ease;}
 .fx-cursor-shape{fill:rgba(5,12,31,.94);stroke:var(--fx-c,#00ff88);stroke-width:2;stroke-linejoin:round;transition:fill .2s ease,stroke-width .2s ease;}
 #fx-ring.hover{filter:drop-shadow(0 0 6px var(--fx-c,#00ff88)) drop-shadow(0 0 20px var(--fx-c,#00ff88));}
 #fx-ring.hover .fx-cursor-shape{stroke-width:2.8;fill:rgba(0,255,136,.12)}
@@ -998,10 +999,11 @@ footer p{color:var(--sub);font-size:.85rem}
 .m-msg.bot .m-act:hover{background:rgba(79,195,255,.22)}
 .m-msg{animation:fxMsg .35s cubic-bezier(.2,1,.3,1)}
 @keyframes fxMsg{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-@media (hover:none) and (pointer:coarse){#fx-ring{width:30px;height:34px}.fx-tilt:hover{box-shadow:none}}
+@media (hover:none) and (pointer:coarse){#fx-ring{width:26px;height:29.25px}.fx-tilt:hover{box-shadow:none}}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 @media (hover:none) and (pointer:coarse){
-  #modal,#payment-modal,#live-pf-modal,#chat-box,#mobile-menu,.modal-inner,.live-pf-modal iframe{touch-action:pan-y;overscroll-behavior-x:contain}
+  html,body{overscroll-behavior-x:none}
+  #modal,#payment-modal,#live-pf-modal,#chat-box,#mobile-menu,.modal-inner,.live-pf-modal iframe{touch-action:pan-y;overscroll-behavior:contain}
   #chat-chips{touch-action:pan-y;overflow-x:visible}
   .live-pf-iframe-wrap{position:relative}
   .pf-swipe-dismiss-zone{display:block;position:absolute;top:0;bottom:0;width:18px;z-index:20;background:transparent;touch-action:pan-y}
@@ -2020,9 +2022,16 @@ if (typeof Stripe !== 'undefined') {
   });
 }
 
+function syncOverlayPageLock(){
+  const locked=['modal','payment-modal','live-pf-modal','mobile-menu'].some(id=>document.getElementById(id)?.classList.contains('open'));
+  document.body.style.overflow=locked?'hidden':'';
+  document.documentElement.classList.toggle('overlay-active',locked);
+  document.body.classList.toggle('overlay-active',locked);
+}
+
 function openPaymentModal(serviceName = '') {
   document.getElementById('payment-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  syncOverlayPageLock();
   
   if (cardElement && !document.getElementById('card-element').hasChildNodes()) {
     cardElement.mount('#card-element');
@@ -2045,7 +2054,7 @@ function openPaymentModal(serviceName = '') {
 
 function closePaymentModal() {
   document.getElementById('payment-modal').classList.remove('open');
-  document.body.style.overflow = 'auto';
+  syncOverlayPageLock();
 }
 
 function handlePayModalClick(e) {
@@ -2276,7 +2285,7 @@ function openLivePortfolioModal(index){
   },30);
 
   modal.classList.add('open');
-  document.body.style.overflow='hidden';
+  syncOverlayPageLock();
 }
 
 function closeLivePortfolioModal(){
@@ -2286,7 +2295,7 @@ function closeLivePortfolioModal(){
   clearTimeout(window._pfFallbackTimer);
   iframe.src='about:blank';
   document.getElementById('live-pf-fallback').classList.remove('show');
-  document.body.style.overflow='auto';
+  syncOverlayPageLock();
 }
 
 function handleLivePfModalClick(e){
@@ -2701,11 +2710,11 @@ const modals = {
 function openModal(id){
   document.getElementById('modal-body').innerHTML = modals[id]||'<h2>Coming soon</h2>';
   document.getElementById('modal').classList.add('open');
-  document.body.style.overflow='hidden';
+  syncOverlayPageLock();
 }
 function closeModal(){
   document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow='auto';
+  syncOverlayPageLock();
 }
 function handleModalClick(e){if(e.target===document.getElementById('modal'))closeModal()}
 
@@ -2715,7 +2724,7 @@ function toggleMenu(){
   const btn = document.querySelector('.hamburger');
   menu.classList.toggle('open');
   const isOpen = menu.classList.contains('open');
-  document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+  syncOverlayPageLock();
   if(btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
@@ -3150,7 +3159,8 @@ function renderChatChips(){
       function placeRing(x,y,scale=1){
         const tipX=ring.clientWidth*(60/64),tipY=ring.clientHeight*(27/72);
         ring.style.transformOrigin=tipX+'px '+tipY+'px';
-        ring.style.transform='translate('+(x-tipX)+'px,'+(y-tipY)+'px) scale('+scale+')';
+        ring.style.left=(x-tipX)+'px'; ring.style.top=(y-tipY)+'px';
+        ring.style.transform='scale('+scale+')';
       }
       window.addEventListener('pointermove',e=>{
         dx=e.clientX; dy=e.clientY;
@@ -3235,22 +3245,17 @@ setLang = function(l){ __origSetLang(l); renderChatChips(); };
 renderChatChips();
 
 
-// Mobile/tablet: horizontal swipes dismiss overlays without losing the page scroll position.
-(function bindTouchSwipeDismiss(){
-  const surfaces=[
-    ['#modal',closeModal],['#payment-modal',closePaymentModal],
-    ['#live-pf-modal',closeLivePortfolioModal],['#chat-box',closeChat],['#mobile-menu',toggleMenu]
-  ];
-  const bind= (surface,close)=>{
-    let start=null;
-    surface.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.touches[0];start={x:t.clientX,y:t.clientY,horizontal:false};},{passive:true});
-    surface.addEventListener('touchmove',e=>{if(!start||e.touches.length!==1)return;const t=e.touches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;if(Math.abs(dx)>20&&Math.abs(dx)>Math.abs(dy)*1.15){start.horizontal=true;if(e.cancelable)e.preventDefault();}},{passive:false});
-    surface.addEventListener('touchend',e=>{if(!start)return;const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;const dismiss=start.horizontal&&Math.abs(dx)>=54&&Math.abs(dx)>Math.abs(dy)*1.15;start=null;if(dismiss){if(e.cancelable)e.preventDefault();close();}},{passive:false});
-    surface.addEventListener('touchcancel',()=>{start=null;},{passive:true});
-  };
-  surfaces.forEach(([selector,close])=>{const surface=document.querySelector(selector);if(surface)bind(surface,close);});
-  const preview=document.querySelector('.live-pf-iframe-wrap');
-  if(preview){['left','right'].forEach(side=>{const zone=document.createElement('div');zone.className='pf-swipe-dismiss-zone '+side;zone.setAttribute('aria-hidden','true');preview.appendChild(zone);bind(zone,closeLivePortfolioModal);});}
+// Mobile/tablet: robust touch dismissal for menus and overlays.
+(function bindTouchDismiss(){
+  const definitions=[['#modal',closeModal],['#payment-modal',closePaymentModal],['#live-pf-modal',closeLivePortfolioModal],['#chat-box',closeChat],['#mobile-menu',toggleMenu]];
+  const active=()=>definitions.some(([selector])=>{const el=document.querySelector(selector);return el&&(el.classList.contains('open')||el.style.display==='flex');});
+  let gesture=null;
+  document.addEventListener('touchstart',e=>{if(!active()||e.touches.length!==1){gesture=null;return;}const t=e.touches[0],target=e.target,menu=target.closest?.('#mobile-menu'),overlay=target.closest?.('.modal,#chat-box'),dismissArea=!!menu||target.matches?.('.modal')||!!target.closest?.('.modal-close,.live-pf-modal-head,.pf-modal-bar,.close-menu');gesture={x:t.clientX,y:t.clientY,target,menu:!!menu,overlay:!!overlay,dismissArea};},{capture:true,passive:true});
+  document.addEventListener('touchmove',e=>{if(!gesture||e.touches.length!==1)return;const t=e.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)*1.05&&e.cancelable)e.preventDefault();},{capture:true,passive:false});
+  document.addEventListener('touchend',e=>{if(!gesture)return;const t=e.changedTouches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y,horizontal=Math.abs(dx)>=52&&Math.abs(dx)>Math.abs(dy)*1.08,vertical=Math.abs(dy)>=72&&Math.abs(dy)>Math.abs(dx)*1.08;let dismiss=horizontal||((gesture.menu||gesture.dismissArea)&&vertical);if(vertical&&gesture.overlay&&!gesture.dismissArea){const targetIsControl=!!gesture.target.closest?.('a,button,input,select,textarea,iframe'),scroller=gesture.target.closest?.('.chat-messages,.modal'),atTop=!scroller||scroller.scrollTop<=0,atBottom=!scroller||scroller.scrollTop+scroller.clientHeight>=scroller.scrollHeight-2;dismiss=!targetIsControl&&((dy>0&&atTop)||(dy<0&&atBottom));}gesture=null;if(!dismiss)return;if(e.cancelable)e.preventDefault();const top=document.querySelector('#live-pf-modal.open')?closeLivePortfolioModal:document.querySelector('#payment-modal.open')?closePaymentModal:document.querySelector('#modal.open')?closeModal:document.querySelector('#mobile-menu.open')?toggleMenu:closeChat;top();},{capture:true,passive:false});
+  document.addEventListener('touchcancel',()=>{gesture=null;},{capture:true,passive:true});
+  document.addEventListener('click',e=>{const button=e.target.closest?.('.modal-close,.chat-close-btn,.close-menu');if(!button)return;e.preventDefault();e.stopPropagation();if(button.closest('#live-pf-modal'))closeLivePortfolioModal();else if(button.closest('#payment-modal'))closePaymentModal();else if(button.closest('#modal'))closeModal();else if(button.closest('#chat-box'))closeChat();else if(button.closest('#mobile-menu'))toggleMenu();},true);
+  const preview=document.querySelector('.live-pf-iframe-wrap');if(preview){['left','right'].forEach(side=>{const zone=document.createElement('div');zone.className='pf-swipe-dismiss-zone '+side;zone.setAttribute('aria-hidden','true');preview.appendChild(zone);});}
 })();
 
 // ─── INICIALIZAR PORTAFOLIO WEB ───
